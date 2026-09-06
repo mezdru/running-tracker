@@ -17,15 +17,16 @@ import type { ExpoConfig } from 'expo/config';
 //   2. le passer par EAS_PROJECT_ID — variable de dépôt GitHub `EAS_PROJECT_ID`,
 //      que .github/workflows/release-ios.yml injecte déjà.
 //
-// Laissé vide tant que le projet Expo n'existe pas : un ID inventé serait pire
-// que pas d'ID du tout, eas-cli publierait sur le mauvais projet.
-const EAS_PROJECT_ID = '';
+// Renseigné : projet expo.dev/accounts/mezdru/projects/running-tracker.
+const EAS_PROJECT_ID = 'f39e047e-81da-44cb-b2a4-cc4ec4830179';
 
 const easProjectId = process.env.EAS_PROJECT_ID || EAS_PROJECT_ID;
 
 const config: ExpoConfig = {
   name: 'Allure',
-  slug: 'allure',
+  // Doit correspondre au projet EAS (expo.dev/accounts/mezdru/projects/…) :
+  // eas-cli refuse de publier si le slug diverge de celui du projet.
+  slug: 'running-tracker',
   version: '1.0.0',
   orientation: 'portrait',
   icon: './assets/icon.png',
