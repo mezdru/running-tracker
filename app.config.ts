@@ -67,9 +67,9 @@ const config: ExpoConfig = {
       'expo-location',
       {
         locationWhenInUsePermission:
-          'Allure utilise votre position pour mesurer la distance, l’allure et le tracé de vos séances.',
+          'Votre position sert à mesurer la distance, l’allure et le tracé de vos séances.',
         locationAlwaysAndWhenInUsePermission:
-          'Allure enregistre votre parcours même écran verrouillé, pour ne pas interrompre la séance en cours.',
+          'Le parcours continue d’être enregistré écran verrouillé, pour ne pas interrompre la séance en cours.',
         // Ajoute le mode de fond `location` côté natif et le drapeau qui
         // autorise `startLocationUpdatesAsync`. Sans lui, la trace s'arrête
         // net au verrouillage de l'écran.

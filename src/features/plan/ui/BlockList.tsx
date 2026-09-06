@@ -52,7 +52,7 @@ function IconButton({
     <Pressable
       onPress={onPress}
       disabled={disabled}
-      hitSlop={6}
+      hitSlop={4}
       accessibilityRole="button"
       accessibilityLabel={label}
       style={({ pressed }) => [styles.iconButton, { opacity: disabled ? 0.25 : pressed ? 0.5 : 1 }]}
@@ -272,6 +272,10 @@ const styles = StyleSheet.create({
     marginTop: spacing.sm,
   },
   blockActions: { flexDirection: 'row', gap: spacing.md, marginLeft: 'auto' },
-  iconButton: { padding: 4 },
-  addStep: { flexDirection: 'row', alignItems: 'center', gap: spacing.xs, padding: 4 },
+  // 18 px d'icône + 9 pt de marge = 36 pt, que `hitSlop={4}` porte à 44 pt.
+  // La marge passe par le remplissage plutôt que par le seul `hitSlop` : à
+  // 12 pt d'écart, deux zones étendues de 10 pt se chevaucheraient et un appui
+  // entre deux icônes deviendrait imprévisible.
+  iconButton: { padding: 9 },
+  addStep: { flexDirection: 'row', alignItems: 'center', gap: spacing.xs, padding: 8 },
 });

@@ -65,8 +65,8 @@ const styles = StyleSheet.create({
     padding: 4,
   },
   button: {
-    width: 38,
-    height: 38,
+    width: 44,
+    height: 44,
     borderRadius: radius.pill,
     backgroundColor: colors.surfaceHi,
     alignItems: 'center',

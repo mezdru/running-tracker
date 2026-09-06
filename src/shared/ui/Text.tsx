@@ -4,7 +4,7 @@
 import type { ReactNode } from 'react';
 import { Text as RNText, StyleSheet, type TextProps, type TextStyle } from 'react-native';
 
-import { colors, type as typography } from '@/shared/theme';
+import { type as typography } from '@/shared/theme';
 
 type Props = TextProps & {
   children: ReactNode;
@@ -12,24 +12,26 @@ type Props = TextProps & {
   style?: TextStyle | TextStyle[];
 };
 
-function make(base: TextStyle, defaultColor: string) {
+// La couleur vient du jeton lui-même : la dupliquer ici ferait deux sources de
+// vérité, et c'est exactement le genre d'écart qui finit par produire du texte
+// invisible sur un écran qu'on ne regarde qu'une fois par mois.
+function make(base: TextStyle) {
   return function Typed({ children, color, style, ...rest }: Props) {
     return (
-      <RNText {...rest} style={[base, { color: color ?? defaultColor }, style]}>
+      <RNText {...rest} style={[base, color ? { color } : null, style]}>
         {children}
       </RNText>
     );
   };
 }
 
-export const Display = make(typography.display, colors.text);
-export const Metric = make(typography.metric, colors.text);
-export const Title = make(typography.title, colors.text);
-export const Heading = make(typography.h2, colors.text);
-export const Body = make(typography.body, colors.text);
-export const BodyStrong = make(typography.bodyStrong, colors.text);
-export const Small = make(typography.small, colors.textMuted);
+export const Display = make(typography.display);
+export const Metric = make(typography.metric);
+export const Title = make(typography.title);
+export const Heading = make(typography.h2);
+export const Body = make(typography.body);
+export const BodyStrong = make(typography.bodyStrong);
+export const Small = make(typography.small);
 export const Label = make(
   StyleSheet.flatten([typography.label, { textTransform: 'uppercase' as const }]),
-  colors.textFaint,
 );

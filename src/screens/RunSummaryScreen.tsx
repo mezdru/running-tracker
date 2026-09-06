@@ -16,7 +16,7 @@ import { usePlanStore } from '@/features/plan/store';
 import { fromKey, labelDayFull, toKey } from '@/shared/lib/date';
 import { formatDuration, formatKm, formatPace } from '@/shared/lib/format';
 import { colors, spacing } from '@/shared/theme';
-import { Button, Card, EmptyState, Label, Metric, Screen } from '@/shared/ui';
+import { Button, Card, EmptyState, Screen, Stat } from '@/shared/ui';
 
 type Nav = NativeStackNavigationProp<RootStackParamList, 'RunSummary'>;
 type SummaryRoute = RouteProp<RootStackParamList, 'RunSummary'>;
@@ -75,12 +75,7 @@ export function RunSummaryScreen() {
 
       <Card style={styles.stats}>
         <CountUp value={activity.durationS} format={(value) => formatDuration(value)}>
-          {(text) => (
-            <View style={styles.stat}>
-              <Metric>{text}</Metric>
-              <Label>Temps</Label>
-            </View>
-          )}
+          {(text) => <Stat align="center" value={text} label="Temps" />}
         </CountUp>
         <CountUp
           value={averagePace(activity)}
@@ -95,24 +90,14 @@ export function RunSummaryScreen() {
             return formatPace(from - (from - target) * (value / (target || 1)));
           }}
         >
-          {(text) => (
-            <View style={styles.stat}>
-              <Metric>{text}</Metric>
-              <Label>Allure /km</Label>
-            </View>
-          )}
+          {(text) => <Stat align="center" value={text} label="Allure /km" />}
         </CountUp>
         <CountUp
           value={activity.elevGainM}
           delay={320}
           format={(value) => `${Math.round(value)}`}
         >
-          {(text) => (
-            <View style={styles.stat}>
-              <Metric>{text}</Metric>
-              <Label>D+ (m)</Label>
-            </View>
-          )}
+          {(text) => <Stat align="center" value={text} label="D+ (m)" />}
         </CountUp>
       </Card>
 
@@ -137,7 +122,6 @@ const styles = StyleSheet.create({
     marginTop: spacing.xxl,
     backgroundColor: colors.surface,
   },
-  stat: { alignItems: 'center', gap: 2 },
   rewards: { paddingVertical: spacing.lg },
   actions: { paddingTop: spacing.xl },
 });

@@ -20,6 +20,24 @@ module.exports = defineConfig([
     languageOptions: { globals: { Buffer: 'readonly' } },
   },
   {
+    // Aucune couleur littérale dans un composant. Le thème est la seule source :
+    // une valeur écrite sur place échappe à la vérification de contraste de
+    // `theme/contrast.test.ts`, et c'est exactement comme ça qu'on se retrouve
+    // avec un gris illisible en plein soleil.
+    files: ['src/**/*.tsx'],
+    ignores: ['src/features/activity/ui/Confetti.tsx'],
+    rules: {
+      'no-restricted-syntax': [
+        'error',
+        {
+          selector: 'Literal[value=/^#[0-9a-fA-F]{3,8}$/]',
+          message:
+            'Pas de couleur codée en dur : ajoutez un jeton dans src/shared/theme.',
+        },
+      ],
+    },
+  },
+  {
     files: ['**/*.test.{ts,tsx}', 'jest.setup.js'],
     languageOptions: {
       globals: {

@@ -47,6 +47,16 @@ n'importe jamais une couche plus spécifique qu'elle.
   `readBackup` doit continuer à lire les versions antérieures : un fichier
   exporté aujourd'hui doit se restaurer dans deux ans. Toute restauration
   passe par une transaction et par un instantané préalable.
+- **Un jeton de typographie porte sa couleur.** `src/shared/theme` définit
+  l'encre de chaque rôle, et les écrans n'écrivent aucune valeur hexadécimale —
+  le linter le refuse. Sans cela, un `<Text>` qui n'applique que la taille
+  retombe sur le noir de React Native : du noir sur un fond noir, invisible à
+  l'écran comme à la relecture.
+- **Une couleur se justifie par un rapport de contraste**, mesuré dans
+  `theme/contrast.test.ts` : 4,5:1 pour du texte, 3:1 pour un trait qui porte
+  du sens. L'app se lit en courant, en plein soleil.
+- **Une zone tappable fait 44 pt**, au besoin par `hitSlop` — sans que deux
+  zones voisines se chevauchent.
 - **Une migration ne se modifie pas après coup.** On en ajoute une nouvelle à la
   fin de `src/shared/db/migrations.ts`.
 - Les commentaires expliquent **pourquoi**, pas quoi. En français.

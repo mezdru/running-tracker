@@ -8,7 +8,7 @@ import type { Reward } from '../rewards';
 
 const TIER_COLOR: Record<Reward['tier'], string> = {
   record: colors.accent,
-  milestone: '#C77DFF',
+  milestone: colors.celebration,
   goal: colors.success,
 };
 

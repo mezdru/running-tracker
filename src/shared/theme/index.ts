@@ -12,12 +12,22 @@ export const colors = {
   surface: '#13171C',
   surfaceAlt: '#1A1F26',
   surfaceHi: '#222932',
+  // Filet décoratif : il souligne un bord que le fond distingue déjà.
   border: '#242B34',
-  borderStrong: '#36404D',
+  // Bord PORTEUR de sens — contour d'une zone tappable, jauge de graphique,
+  // poignée de feuille. Tenu à 3:1 sur le fond, le seuil AA des éléments non
+  // textuels.
+  borderStrong: '#5A6879',
 
   text: '#F5F7FA',
   textMuted: '#98A3B0',
-  textFaint: '#616D7B',
+  // Troisième niveau de gris. Il porte les intitulés en 12 px (`type.label`),
+  // donc il doit tenir 4,5:1 — le seuil AA du texte normal — y compris sur
+  // `surfaceHi`, la surface la plus claire de l'app : #616D7B n'y était qu'à
+  // 2,8:1. La hiérarchie avec `textMuted` se joue désormais surtout sur la
+  // taille et la graisse, ce qui est de toute façon plus robuste que 15 % de
+  // luminance en plein soleil.
+  textFaint: '#8592A3',
 
   // Vert acide : c'est la couleur d'action de l'app (démarrer, valider,
   // sélection active). Volontairement unique, pour qu'un bouton important ne
@@ -27,6 +37,12 @@ export const colors = {
   accentInk: '#0A0C0F',
 
   danger: '#FF5B5B',
+  // Bleu d'information : partir TROP VITE sur un fractionné est une erreur
+  // aussi, mais ce n'est pas la même que traîner — elle ne mérite pas l'ambre.
+  info: '#5AA9FF',
+  // Violet des jalons franchis, distinct du vert d'action pour qu'un record
+  // personnel ne se lise pas comme un bouton.
+  celebration: '#C77DFF',
   success: '#34D399',
   warning: '#FFB020',
 
@@ -65,6 +81,11 @@ export const radius = {
   pill: 999,
 } as const;
 
+// Chaque jeton porte sa couleur d'encre. Sans elle, un `<Text>` qui n'applique
+// que la taille retombe sur le noir de React Native — invisible sur un fond
+// sombre, et invisible aussi à la relecture, puisqu'il ne manque rien à l'œil
+// dans le code. Le bug s'était glissé quatre fois, dont l'écran de secours.
+//
 // `fontVariant: ['tabular-nums']` sur tout ce qui est chiffré : sans lui, un
 // chrono qui défile fait sautiller la mise en page à chaque changement de
 // chiffre — insupportable sur l'écran de course.
@@ -83,23 +104,26 @@ export const type: Record<
   TextStyle
 > = {
   display: {
+    color: colors.text,
     fontSize: 60,
     fontWeight: '800',
     letterSpacing: -2,
     fontVariant: ['tabular-nums'],
   },
   metric: {
+    color: colors.text,
     fontSize: 32,
     fontWeight: '700',
     letterSpacing: -0.8,
     fontVariant: ['tabular-nums'],
   },
-  title: { fontSize: 27, fontWeight: '800', letterSpacing: -0.6 },
-  h2: { fontSize: 19, fontWeight: '700', letterSpacing: -0.3 },
-  body: { fontSize: 15, fontWeight: '500' },
-  bodyStrong: { fontSize: 15, fontWeight: '700' },
-  small: { fontSize: 13, fontWeight: '500' },
-  label: { fontSize: 11, fontWeight: '700', letterSpacing: 0.8 },
+  title: { color: colors.text, fontSize: 27, fontWeight: '800', letterSpacing: -0.6 },
+  h2: { color: colors.text, fontSize: 19, fontWeight: '700', letterSpacing: -0.3 },
+  body: { color: colors.text, fontSize: 15, fontWeight: '500' },
+  bodyStrong: { color: colors.text, fontSize: 15, fontWeight: '700' },
+  small: { color: colors.textMuted, fontSize: 13, fontWeight: '500' },
+  // 12 px et non 11 : ces intitulés se lisent à bout de bras, en courant.
+  label: { color: colors.textFaint, fontSize: 12, fontWeight: '700', letterSpacing: 0.6 },
 };
 
 export const theme = { colors, spacing, radius, type, zonePalette };

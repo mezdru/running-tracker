@@ -49,7 +49,10 @@ export function WeeklyBars({ weeks, height = 150 }: Props) {
                   y={height - planned}
                   width={barWidth}
                   height={planned}
-                  fill={colors.surfaceHi}
+                  // `borderStrong` et non `surfaceHi` : cette barre porte une
+                  // donnée, elle doit tenir 3:1 sur le fond de la carte, où
+                  // `surfaceHi` n'était qu'à 1,4:1 — invisible.
+                  fill={colors.borderStrong}
                   rx={0.6}
                 />
               ) : null}
@@ -80,7 +83,7 @@ export function WeeklyBars({ weeks, height = 150 }: Props) {
 
       <View style={styles.legend}>
         <Legend color={colors.accent} label="Réalisé" />
-        <Legend color={colors.surfaceHi} label="Prévu" />
+        <Legend color={colors.borderStrong} label="Prévu" />
         {weeks.some((week) => week.targetM) ? (
           <Legend color={colors.warning} label="Objectif du plan" />
         ) : null}

@@ -52,8 +52,13 @@ export function DayRow({
       </View>
 
       {workouts.length === 0 ? (
-        <Pressable onPress={() => onAdd(key)} style={styles.rest} accessibilityRole="button">
-          <Small style={styles.restLabel}>Repos</Small>
+        <Pressable
+          onPress={() => onAdd(key)}
+          style={styles.rest}
+          accessibilityRole="button"
+          accessibilityLabel={`Repos, ajouter une séance le ${labelDayFull(day)}`}
+        >
+          <Small>Repos</Small>
         </Pressable>
       ) : (
         <View style={styles.list}>
@@ -77,8 +82,8 @@ const styles = StyleSheet.create({
   wrap: { gap: spacing.sm },
   header: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
   add: {
-    width: 26,
-    height: 26,
+    width: 28,
+    height: 28,
     borderRadius: radius.pill,
     backgroundColor: colors.surfaceAlt,
     alignItems: 'center',
@@ -88,10 +93,14 @@ const styles = StyleSheet.create({
   rest: {
     borderRadius: radius.md,
     borderWidth: 1,
-    borderColor: colors.border,
+    // Contour porteur : c'est lui, et rien d'autre, qui dit que la journée
+    // vide se touche pour y ajouter une séance.
+    borderColor: colors.borderStrong,
     borderStyle: 'dashed',
+    // 44 pt de haut : la zone se vise sans regarder.
+    minHeight: 44,
     paddingVertical: spacing.md,
     alignItems: 'center',
+    justifyContent: 'center',
   },
-  restLabel: { color: colors.textFaint },
 });

@@ -181,7 +181,7 @@ export function PlanScreen() {
             ]}
           />
         </View>
-        <Button label="Aujourd’hui" variant="secondary" size="sm" onPress={goToday} />
+        <Button label="Aujourd’hui" variant="secondary" onPress={goToday} />
       </View>
 
       {plan ? (
@@ -266,9 +266,13 @@ export function PlanScreen() {
         <View style={styles.section}>
           <WeekTotals summary={summary} />
 
+          {/* Débordant jusqu'aux bords de l'écran : coupée sur le retrait de
+              la page, la dernière action semblait tronquée par un défaut
+              d'affichage plutôt que par un contenu à faire défiler. */}
           <ScrollView
             horizontal
             showsHorizontalScrollIndicator={false}
+            style={styles.weekActionsTrack}
             contentContainerStyle={styles.weekActions}
           >
             <Button
@@ -406,8 +410,8 @@ const styles = StyleSheet.create({
   title: { textTransform: 'capitalize' },
   navButtons: { flexDirection: 'row', gap: spacing.sm },
   navButton: {
-    width: 36,
-    height: 36,
+    width: 40,
+    height: 40,
     borderRadius: radius.pill,
     backgroundColor: colors.surfaceAlt,
     alignItems: 'center',
@@ -434,6 +438,7 @@ const styles = StyleSheet.create({
   },
   list: { gap: spacing.sm },
   restDay: { color: colors.textFaint },
-  weekActions: { gap: spacing.sm, paddingRight: spacing.lg },
+  weekActionsTrack: { marginHorizontal: -spacing.lg },
+  weekActions: { gap: spacing.sm, paddingHorizontal: spacing.lg },
   days: { gap: spacing.xl },
 });

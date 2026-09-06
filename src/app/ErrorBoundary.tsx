@@ -44,7 +44,7 @@ const styles = StyleSheet.create({
     padding: spacing.xl,
     gap: spacing.lg,
   },
-  title: { textAlign: 'center' },
+  title: { color: colors.text, textAlign: 'center' },
   detail: { color: colors.textMuted, textAlign: 'center' },
   button: {
     backgroundColor: colors.accent,

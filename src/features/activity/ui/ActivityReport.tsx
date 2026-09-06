@@ -43,19 +43,22 @@ export function ActivityReport({ activity, zones, variant = 'full' }: Props) {
 
       <Card style={styles.secondary}>
         <View style={styles.secondaryItem}>
-          <Label>En mouvement</Label>
+          {/* « En mouvement » passait à deux lignes et faisait descendre sa
+              valeur sous celles des colonnes voisines. Une seule ligne, quitte
+              à raccourcir : c'est la rangée de valeurs qu'on parcourt. */}
+          <Label numberOfLines={1}>Mouvement</Label>
           {/* Même format que le temps total juste au-dessus : « 2 min » en face
               de « 01:31 » se lit comme une incohérence. */}
           <Body style={styles.secondaryValue}>{formatDuration(activity.movingS)}</Body>
         </View>
         {full ? (
           <View style={styles.secondaryItem}>
-            <Label>Dénivelé +</Label>
+            <Label numberOfLines={1}>Dénivelé +</Label>
             <Body style={styles.secondaryValue}>{Math.round(activity.elevGainM)} m</Body>
           </View>
         ) : null}
         <View style={styles.secondaryItem}>
-          <Label>Points GPS</Label>
+          <Label numberOfLines={1}>Points GPS</Label>
           <Body style={styles.secondaryValue}>{activity.track.length}</Body>
         </View>
       </Card>
@@ -120,8 +123,8 @@ export function ActivityReport({ activity, zones, variant = 'full' }: Props) {
 const styles = StyleSheet.create({
   wrap: { gap: spacing.lg },
   stats: { flexDirection: 'row', justifyContent: 'space-between' },
-  secondary: { flexDirection: 'row', justifyContent: 'space-between' },
-  secondaryItem: { gap: 2 },
+  secondary: { flexDirection: 'row', justifyContent: 'space-between', gap: spacing.md },
+  secondaryItem: { flex: 1, gap: 2 },
   secondaryValue: { fontWeight: '700' },
   section: { gap: spacing.md },
   laps: { gap: spacing.xs },

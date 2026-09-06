@@ -1,9 +1,11 @@
 import { X } from 'lucide-react-native';
 import type { ReactNode } from 'react';
-import { Modal, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Modal, Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { colors, radius, spacing, type as typography } from '@/shared/theme';
+import { colors, radius, spacing } from '@/shared/theme';
+
+import { Heading } from './Text';
 
 type Props = {
   visible: boolean;
@@ -31,8 +33,15 @@ export function Sheet({ visible, onClose, title, children, scroll = true }: Prop
       <View style={[styles.sheet, { paddingBottom: insets.bottom + spacing.lg }]}>
         <View style={styles.grabber} />
         <View style={styles.header}>
-          <Text style={typography.h2}>{title}</Text>
-          <Pressable onPress={onClose} accessibilityRole="button" accessibilityLabel="Fermer">
+          <Heading numberOfLines={1} style={styles.title}>
+            {title}
+          </Heading>
+          <Pressable
+            onPress={onClose}
+            hitSlop={12}
+            accessibilityRole="button"
+            accessibilityLabel="Fermer"
+          >
             <X size={22} color={colors.textMuted} />
           </Pressable>
         </View>
@@ -72,6 +81,9 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
     marginTop: spacing.md,
   },
+  // Le titre reprend le retrait du contenu et cède la place à la croix : un
+  // nom de séance long poussait le bouton de fermeture hors de l'écran.
+  title: { flex: 1, marginRight: spacing.md },
   header: {
     flexDirection: 'row',
     alignItems: 'center',

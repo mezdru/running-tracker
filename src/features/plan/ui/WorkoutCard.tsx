@@ -29,7 +29,7 @@ export function WorkoutCard({ workout, onPress, onToggleDone, onMore, onDuplicat
         </View>
         <Pressable
           onPress={onToggleDone}
-          hitSlop={8}
+          hitSlop={10}
           accessibilityRole="checkbox"
           accessibilityState={{ checked: workout.done }}
           accessibilityLabel={workout.done ? 'Marquer comme non faite' : 'Marquer comme faite'}
@@ -48,20 +48,20 @@ export function WorkoutCard({ workout, onPress, onToggleDone, onMore, onDuplicat
         {onDuplicate ? (
           <Pressable
             onPress={onDuplicate}
-            hitSlop={8}
+            hitSlop={10}
             accessibilityRole="button"
             accessibilityLabel="Dupliquer la séance"
           >
-            <Copy size={16} color={colors.textFaint} />
+            <Copy size={18} color={colors.textMuted} />
           </Pressable>
         ) : null}
         <Pressable
           onPress={onMore}
-          hitSlop={8}
+          hitSlop={10}
           accessibilityRole="button"
           accessibilityLabel="Actions sur la séance"
         >
-          <MoreHorizontal size={18} color={colors.textFaint} />
+          <MoreHorizontal size={20} color={colors.textMuted} />
         </Pressable>
       </View>
     </Card>
@@ -84,6 +84,6 @@ const styles = StyleSheet.create({
   },
   footer: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm },
   metric: { color: colors.text, fontWeight: '600' },
-  dot: { color: colors.textFaint },
+  dot: { color: colors.textMuted },
   spacer: { flex: 1 },
 });

@@ -7,7 +7,7 @@ import { SectionList, StyleSheet, View } from 'react-native';
 import type { RootStackParamList } from '@/app/navigation/types';
 import { averagePace, type Activity } from '@/entities/activity/model';
 import { usePlanStore } from '@/features/plan/store';
-import { formatDuration, formatKm, formatPace } from '@/shared/lib/format';
+import { formatDuration, formatDurationShort, formatKm, formatPace } from '@/shared/lib/format';
 import { colors, spacing } from '@/shared/theme';
 import { Body, Card, EmptyState, Label, Screen, Small, Stat, Title } from '@/shared/ui';
 
@@ -60,7 +60,7 @@ export function ActivitiesScreen() {
             {totals.count > 0 ? (
               <Card style={styles.totals}>
                 <Stat value={formatKm(totals.distance)} unit="km" label="Total" />
-                <Stat value={formatDuration(totals.duration)} label="Temps" />
+                <Stat value={formatDurationShort(totals.duration)} label="Temps" />
                 <Stat value={String(totals.count)} label="Sorties" />
               </Card>
             ) : null}

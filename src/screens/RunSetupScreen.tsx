@@ -76,12 +76,21 @@ export function RunSetupScreen() {
         </Card>
       )}
 
+      {/* Sans séance du jour, partir en sortie libre est LE geste de l'écran :
+          il prend la couleur d'action. Dès qu'une séance est prévue, il
+          redevient secondaire pour ne pas concurrencer son bouton. */}
       <View style={styles.section}>
         <Button
           label="Sortie libre"
-          variant="secondary"
+          variant={todays.length > 0 ? 'secondary' : 'primary'}
           full
-          icon={<Zap size={16} color={colors.text} />}
+          icon={
+            <Zap
+              size={16}
+              color={todays.length > 0 ? colors.text : colors.accentInk}
+              fill={todays.length > 0 ? 'transparent' : colors.accentInk}
+            />
+          }
           onPress={() => navigation.navigate('RunSession', {})}
         />
       </View>
@@ -106,6 +115,6 @@ const styles = StyleSheet.create({
   cardTitle: { flex: 1, gap: spacing.xs },
   metrics: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm },
   metric: { fontWeight: '700' },
-  dot: { color: colors.textFaint },
+  dot: { color: colors.textMuted },
   when: { marginLeft: 'auto', color: colors.textFaint, textTransform: 'capitalize' },
 });

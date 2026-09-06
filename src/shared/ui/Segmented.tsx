@@ -47,7 +47,9 @@ const styles = StyleSheet.create({
   },
   item: {
     flex: 1,
-    height: 32,
+    // 40 pt + les 3 pt de la piste : la cible atteint 46 pt, au-dessus du
+    // minimum recommandé.
+    height: 40,
     borderRadius: radius.pill,
     alignItems: 'center',
     justifyContent: 'center',

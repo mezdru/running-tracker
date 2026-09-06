@@ -13,7 +13,7 @@ import { currentStep, nextStep, useRunStore } from '@/features/run/store';
 import { LiveTrace } from '@/features/run/ui/LiveTrace';
 import { formatDistance, formatDuration, formatPace } from '@/shared/lib/format';
 import { colors, radius, spacing } from '@/shared/theme';
-import { Body, Button, Display, Heading, Label, Metric, ProgressRing, Small } from '@/shared/ui';
+import { Body, Button, Display, Heading, Label, ProgressRing, Small, Stat } from '@/shared/ui';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 type Nav = NativeStackNavigationProp<RootStackParamList, 'RunSession'>;
@@ -91,9 +91,8 @@ export function RunSessionScreen() {
     if (!step || run.currentPaceSecPerKm <= 0 || step.targetPaceSecPerKm <= 0) return colors.text;
     const delta = run.currentPaceSecPerKm - step.targetPaceSecPerKm;
     if (Math.abs(delta) <= PACE_TOLERANCE_S) return colors.success;
-    // Trop lent (allure plus élevée) en ambre, trop rapide en bleu : partir
-    // trop vite sur un fractionné est une erreur aussi, mais pas la même.
-    return delta > 0 ? colors.warning : '#5AA9FF';
+    // Trop lent (allure plus élevée) en ambre, trop rapide en bleu.
+    return delta > 0 ? colors.warning : colors.info;
   })();
 
   const confirmQuit = () => {
@@ -226,20 +225,18 @@ export function RunSessionScreen() {
       </View>
 
       <View style={styles.metrics}>
-        <View style={styles.metricCell}>
-          <Metric color={paceColor}>
-            {run.currentPaceSecPerKm > 0 ? formatPace(run.currentPaceSecPerKm) : '—'}
-          </Metric>
-          <Label>Allure</Label>
-        </View>
-        <View style={styles.metricCell}>
-          <Metric>{formatDistance(run.engine.distanceM, { forceKm: true }).replace(' km', '')}</Metric>
-          <Label>Km</Label>
-        </View>
-        <View style={styles.metricCell}>
-          <Metric>{formatDuration(run.engine.elapsedS)}</Metric>
-          <Label>Temps</Label>
-        </View>
+        <Stat
+          align="center"
+          color={paceColor}
+          value={run.currentPaceSecPerKm > 0 ? formatPace(run.currentPaceSecPerKm) : '—'}
+          label="Allure"
+        />
+        <Stat
+          align="center"
+          value={formatDistance(run.engine.distanceM, { forceKm: true }).replace(' km', '')}
+          label="Km"
+        />
+        <Stat align="center" value={formatDuration(run.engine.elapsedS)} label="Temps" />
       </View>
 
       {upcoming ? (
@@ -344,7 +341,6 @@ const styles = StyleSheet.create({
     paddingVertical: spacing.lg,
     paddingHorizontal: spacing.md,
   },
-  metricCell: { flex: 1, alignItems: 'center', gap: 2 },
   next: {
     flexDirection: 'row',
     alignItems: 'center',

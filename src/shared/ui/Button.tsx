@@ -32,7 +32,9 @@ const FOREGROUND: Record<Variant, string> = {
   danger: colors.danger,
 };
 
-const HEIGHT: Record<Size, number> = { sm: 34, md: 46, lg: 56 };
+// `sm` monte à 40 pt et gagne 4 pt de marge de visée : à 34 pt, les barres
+// d'action de la vue semaine passaient sous la cible tactile recommandée.
+const HEIGHT: Record<Size, number> = { sm: 40, md: 46, lg: 56 };
 
 export function Button({
   label,
@@ -50,6 +52,7 @@ export function Button({
     <Pressable
       onPress={onPress}
       disabled={inactive}
+      hitSlop={4}
       accessibilityRole="button"
       accessibilityLabel={label}
       accessibilityState={{ disabled: !!inactive }}
