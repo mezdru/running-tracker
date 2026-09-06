@@ -38,7 +38,7 @@ const config: ExpoConfig = {
   userInterfaceStyle: 'dark',
   backgroundColor: '#0B0D10',
   ios: {
-    bundleIdentifier: 'com.mezdru.allure',
+    bundleIdentifier: 'com.mezdru.runningtracker',
     supportsTablet: false,
     infoPlist: {
       // `location` : la trace GPS doit continuer écran verrouillé, c'est le cas
@@ -54,7 +54,7 @@ const config: ExpoConfig = {
     },
   },
   android: {
-    package: 'com.mezdru.allure',
+    package: 'com.mezdru.runningtracker',
     predictiveBackGestureEnabled: false,
   },
   plugins: [

@@ -229,7 +229,7 @@ la main depuis le Mac fait le même travail et valide toute la chaîne d'un coup
 
 **3. Soumission App Store Connect**
 
-- Créer la fiche de l'app (bundle `com.mezdru.allure`), récupérer son
+- Créer la fiche de l'app (bundle `com.mezdru.runningtracker`), récupérer son
   identifiant numérique et le mettre dans `eas.json` → `submit.production.ios.ascAppId`.
 - Enregistrer une clé d'API App Store Connect côté EAS (proposé au premier
   `eas submit`, ou via `eas credentials`). Sans elle, l'envoi demanderait un mot
@@ -244,7 +244,7 @@ la main depuis le Mac fait le même travail et valide toute la chaîne d'un coup
 Ensuite : *Actions → Release iOS → Run workflow*. La CI (`ci.yml`), elle, ne
 demande **aucun** secret et tourne dès le premier push.
 
-Identifiant de bundle : `com.mezdru.allure`.
+Identifiant de bundle : `com.mezdru.runningtracker`.
 
 ## Commandes
 
