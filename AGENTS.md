@@ -42,6 +42,11 @@ n'importe jamais une couche plus spécifique qu'elle.
   plan est un calendrier, et une clé de jour ne doit pas glisser avec le fuseau.
 - **Dupliquer, c'est régénérer les identifiants** (`cloneBlocks`). Sans cela,
   deux séances partagent leurs étapes et s'éditent ensemble.
+- **La sauvegarde ne se dégrade jamais silencieusement.** Un format de
+  sauvegarde ne se modifie qu'en incrémentant `BACKUP_VERSION`, et
+  `readBackup` doit continuer à lire les versions antérieures : un fichier
+  exporté aujourd'hui doit se restaurer dans deux ans. Toute restauration
+  passe par une transaction et par un instantané préalable.
 - **Une migration ne se modifie pas après coup.** On en ajoute une nouvelle à la
   fin de `src/shared/db/migrations.ts`.
 - Les commentaires expliquent **pourquoi**, pas quoi. En français.

@@ -65,6 +65,17 @@ export function listActivities(): Activity[] {
     .map(toActivity);
 }
 
+/**
+ * Toutes les activités AVEC leur trace. Réservé à la sauvegarde : c'est la
+ * seule opération qui a besoin de l'intégralité des données en mémoire, et
+ * c'est aussi la plus lourde — plusieurs mégaoctets sur une année de course.
+ */
+export function listActivitiesWithTracks(): Activity[] {
+  return db()
+    .getAllSync<Row>('SELECT * FROM activities ORDER BY started_at DESC')
+    .map(toActivity);
+}
+
 export function getActivity(id: string): Activity | null {
   const row = db().getFirstSync<Row>('SELECT * FROM activities WHERE id = ?', [id]);
   return row ? toActivity(row) : null;

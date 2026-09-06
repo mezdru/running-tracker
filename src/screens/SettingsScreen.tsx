@@ -1,9 +1,11 @@
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { ShieldCheck } from 'lucide-react-native';
 import { StyleSheet, View } from 'react-native';
 
 import type { RootStackParamList } from '@/app/navigation/types';
 import { resolvePace } from '@/entities/pace/model';
+import { EXPORT_STALE_AFTER_DAYS } from '@/features/backup/service';
 import { usePlanStore } from '@/features/plan/store';
 import { formatDurationShort, formatPace } from '@/shared/lib/format';
 import { colors, spacing } from '@/shared/theme';
@@ -11,12 +13,31 @@ import { Body, Card, Label, Row, Screen, Small, Stepper, Title, ToggleRow } from
 
 type Nav = NativeStackNavigationProp<RootStackParamList>;
 
+/**
+ * Fraîcheur de la dernière sauvegarde sortie du téléphone.
+ *
+ * Hors du composant, volontairement : lire l'horloge est un effet de bord que
+ * le compilateur React interdit pendant un rendu — et le calcul n'a de toute
+ * façon rien à voir avec l'affichage.
+ */
+function backupFreshness(lastExportAt: number): { hint: string; color: string } {
+  if (lastExportAt <= 0) {
+    return { hint: 'Jamais exportée hors de l’appareil', color: colors.warning };
+  }
+  const days = Math.floor((Date.now() - lastExportAt) / (24 * 3600 * 1000));
+  const color = days >= EXPORT_STALE_AFTER_DAYS ? colors.warning : colors.success;
+  if (days === 0) return { hint: 'Exportée aujourd’hui', color };
+  return { hint: `Dernier export il y a ${days} jour${days > 1 ? 's' : ''}`, color };
+}
+
 export function SettingsScreen() {
   const navigation = useNavigation<Nav>();
   const settings = usePlanStore((state) => state.settings);
   const updateSettings = usePlanStore((state) => state.updateSettings);
   const workouts = usePlanStore((state) => state.workouts);
   const activities = usePlanStore((state) => state.activities);
+
+  const backup = backupFreshness(settings.lastExportAt);
 
   return (
     <Screen scroll>
@@ -114,13 +135,20 @@ export function SettingsScreen() {
       <Label style={styles.sectionLabel}>Données</Label>
       <Card padded={false} style={styles.card}>
         <View style={styles.rows}>
+          <Row
+            label="Sauvegarde"
+            hint={backup.hint}
+            left={<ShieldCheck size={18} color={backup.color} />}
+            onPress={() => navigation.navigate('Backup')}
+          />
           <Row label="Séances planifiées" value={String(workouts.length)} />
           <Row label="Activités enregistrées" value={String(activities.length)} />
         </View>
       </Card>
       <Small style={styles.footnote}>
         Tout est stocké sur cet appareil, dans une base SQLite locale : aucun compte, aucun serveur.
-        Pensez à garder une sauvegarde iCloud du téléphone.
+        C’est ce qui permet de courir sans réseau — et ce qui rend l’export de sauvegarde
+        indispensable.
       </Small>
     </Screen>
   );

@@ -12,6 +12,7 @@ export type RootStackParamList = {
   RunSummary: { activityId: string };
   ActivityDetail: { activityId: string };
   Zones: undefined;
+  Backup: undefined;
 };
 
 export type TabParamList = {

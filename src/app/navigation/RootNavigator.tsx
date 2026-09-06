@@ -4,6 +4,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { CalendarDays, History, Play, Settings2 } from 'lucide-react-native';
 
 import { ActivitiesScreen } from '@/screens/ActivitiesScreen';
+import { BackupScreen } from '@/screens/BackupScreen';
 import { ActivityDetailScreen } from '@/screens/ActivityDetailScreen';
 import { PlanScreen } from '@/screens/PlanScreen';
 import { RunSessionScreen } from '@/screens/RunSessionScreen';
@@ -112,6 +113,7 @@ export function RootNavigator() {
         <Stack.Screen name="RunSummary" component={RunSummaryScreen} />
         <Stack.Screen name="ActivityDetail" component={ActivityDetailScreen} />
         <Stack.Screen name="Zones" component={ZonesScreen} options={{ presentation: 'modal' }} />
+        <Stack.Screen name="Backup" component={BackupScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );

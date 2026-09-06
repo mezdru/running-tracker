@@ -3,12 +3,15 @@ import { StyleSheet, Text, View } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 import { RootNavigator } from '@/app/navigation/RootNavigator';
+import { useAutoBackup } from '@/features/backup/useAutoBackup';
 import { colors, spacing, type as typography } from '@/shared/theme';
 
 import { bootstrapError } from './bootstrap';
 import { ErrorBoundary } from './ErrorBoundary';
 
 export default function App() {
+  useAutoBackup();
+
   return (
     <SafeAreaProvider>
       <StatusBar style="light" />

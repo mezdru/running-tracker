@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react';
-import { Pressable, StyleSheet, View, type ViewStyle } from 'react-native';
+import { Pressable, StyleSheet, View, type StyleProp, type ViewStyle } from 'react-native';
 
 import { colors, radius, spacing } from '@/shared/theme';
 
@@ -7,7 +7,8 @@ type Props = {
   children: ReactNode;
   onPress?: () => void;
   onLongPress?: () => void;
-  style?: ViewStyle | ViewStyle[];
+  // `false` accepté : permet un style conditionnel sans ternaire côté appelant.
+  style?: StyleProp<ViewStyle>;
   /** Bordure colorée à gauche : type de séance, intensité d'une étape. */
   accent?: string;
   padded?: boolean;

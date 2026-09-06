@@ -56,6 +56,16 @@ consécutifs ; semaine la plus longue ; séance bouclée comme prévu ; tous les
 intervalles tenus ; semaine complète. Rien n'est décerné deux fois, et une
 séance ordinaire ne décroche rien — c'est ce qui donne du prix aux autres.
 
+**Ne jamais perdre ses données.** Il n'y a ni serveur ni base distante, donc
+la sauvegarde est une fonctionnalité à part entière, pas une case à cocher.
+Trois filets se superposent : la base vit dans les documents de l'app, donc
+dans la sauvegarde iCloud du téléphone ; l'app prend un instantané complet une
+fois par jour et avant chaque restauration ; et l'export manuel sort un fichier
+unique — plan, allures, modèles, activités et tracés GPS — vers iCloud Drive,
+Fichiers ou n'importe où. La restauration accepte de tout remplacer ou de
+n'ajouter que ce qui manque. Les réglages rappellent quand le dernier export
+hors appareil date de trop.
+
 **Exporter.** Chaque sortie s'exporte en GPX depuis la feuille de partage iOS —
 de quoi l'importer dans Strava dès aujourd'hui, en attendant la synchronisation
 automatique.
@@ -161,6 +171,28 @@ que l'app est faite pour tourner sans couverture — et elle est fausse dès qu'
 quitte les routes, ce qui arrive tout le temps en course à pied (piste, sentier,
 stade, plage). Un baromètre donnerait un meilleur dénivelé que le GPS ; c'est le
 prochain gain de précision identifié.
+
+### La sauvegarde est traitée comme un risque, pas comme une option
+
+Une app sans serveur reporte entièrement le risque de perte sur l'appareil. Le
+code en tire trois conséquences :
+
+- **Rien n'est restauré sans validation.** `entities/backup/model.ts` refuse
+  un fichier qui n'est pas une sauvegarde Allure, une sauvegarde écrite par une
+  version plus récente, des collections mal formées ou des entrées sans
+  identifiant. La moitié des tests de ce module porte sur ce qui doit être
+  **refusé** : un fichier choisi par erreur ne doit jamais écraser un plan.
+- **Une restauration est atomique et réversible.** Elle s'exécute dans une
+  transaction — une interruption ne laisse pas une base à moitié écrasée — et
+  l'app prend systématiquement un instantané *avant restauration*, pour qu'une
+  fausse manœuvre puisse elle aussi être annulée.
+- **Une activité orpheline n'est pas perdue.** Si sa séance n'est pas dans le
+  fichier, la contrainte de clé étrangère refuserait l'insertion et l'effort
+  couru disparaîtrait. Le lien est dénoué, la trace est gardée.
+
+L'instantané quotidien est pris au passage en arrière-plan : c'est le moment où
+l'utilisateur vient de finir ce qu'il faisait, et le dernier où l'app a la main
+avant qu'iOS ne la suspende.
 
 ### Les récompenses sont des faits, pas des félicitations
 

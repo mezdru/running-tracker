@@ -33,6 +33,12 @@ export type Settings = {
    * entre deux séries — d'où le réglage.
    */
   autoPause: boolean;
+  /**
+   * Date du dernier export de sauvegarde HORS de l'appareil, en millisecondes
+   * (0 si jamais). Sert à rappeler que les sauvegardes automatiques restent
+   * sur le téléphone : elles ne protègent pas de sa perte.
+   */
+  lastExportAt: number;
 };
 
 export const DEFAULT_SETTINGS: Settings = {
@@ -44,4 +50,5 @@ export const DEFAULT_SETTINGS: Settings = {
   countdownS: 5,
   autoLapKm: 1,
   autoPause: false,
+  lastExportAt: 0,
 };
