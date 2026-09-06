@@ -1,11 +1,18 @@
 # Release iOS : build EAS puis envoi sur App Store Connect, déclenché à la main
 # depuis l'onglet Actions. Complète ci.yml, qui ne fait que les vérifications.
 #
-# Pré-requis :
-#   - secret de dépôt EXPO_TOKEN (https://expo.dev/settings/access-tokens) ;
-#   - `eas init` exécuté une fois en local, ou la variable EAS_PROJECT_ID ;
-#   - `ascAppId` renseigné dans eas.json (profil submit production), après
-#     création de la fiche dans App Store Connect.
+# Pré-requis, une fois pour toutes :
+#   - SECRET de dépôt `EXPO_TOKEN` (https://expo.dev/settings/access-tokens) —
+#     c'est le seul secret ;
+#   - identifiant du projet Expo : soit collé dans app.config.ts après
+#     `eas init`, soit posé en VARIABLE de dépôt `EAS_PROJECT_ID` (ce n'est pas
+#     un secret, il figure dans l'URL du projet) ;
+#   - credentials iOS créés une fois sur les serveurs EAS (`eas credentials`
+#     depuis un poste connecté au compte Apple Developer). Un build
+#     non interactif ne sait pas les générer lui-même ;
+#   - pour la soumission : fiche créée dans App Store Connect, son `ascAppId`
+#     renseigné dans eas.json, et une clé d'API App Store Connect enregistrée
+#     côté EAS.
 #
 # Le NUMÉRO DE BUILD est géré par EAS (appVersionSource: remote +
 # autoIncrement). La VERSION MARKETING, elle, ne bouge jamais toute seule :
@@ -128,6 +135,10 @@ jobs:
         env:
           PROFILE: ${{ inputs.profile }}
           SUBMIT_FLAG: ${{ inputs.submit && '--auto-submit' || '' }}
+          # Variable de dépôt et non secret : l'identifiant du projet Expo est
+          # public. Vide si l'ID est déjà collé dans app.config.ts, auquel cas
+          # celui-ci prend le relais.
+          EAS_PROJECT_ID: ${{ vars.EAS_PROJECT_ID }}
           EAS_BUILD_NO_EXPO_GO_WARNING: 'true'
 
       # Poussé seulement maintenant : un build raté ne laisse pas derrière lui

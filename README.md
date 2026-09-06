@@ -200,13 +200,49 @@ simulateur, le GPS se simule depuis *Features → Location* de Simulator.
 
 ### Mise en service
 
-1. `eas init` une fois, pour créer le projet côté Expo (écrit l'ID dans
-   `app.config.ts`, ou passez-le par `EAS_PROJECT_ID`).
-2. Créer la fiche dans App Store Connect, puis renseigner `ascAppId` dans
-   `eas.json` (profil `submit.production`).
-3. Ajouter le secret de dépôt `EXPO_TOKEN`
-   (<https://expo.dev/settings/access-tokens>).
-4. Lancer *Release iOS* depuis l'onglet Actions.
+Un seul **secret** GitHub, `EXPO_TOKEN` — mais trois choses à faire une fois
+hors de GitHub, parce qu'un build non interactif ne sait ni créer un projet, ni
+générer des certificats Apple.
+
+**1. Projet Expo** (2 min)
+
+```bash
+npx eas init
+```
+
+Le projet est créé côté Expo. Comme la configuration est dynamique
+(`app.config.ts`), eas-cli n'y écrit pas l'identifiant lui-même : collez-le dans
+la constante `EAS_PROJECT_ID` en haut du fichier, ou posez-le en **variable** de
+dépôt GitHub `EAS_PROJECT_ID` (ce n'est pas un secret, il figure dans l'URL du
+projet). Sans lui, `eas build --non-interactive` s'arrête avant de compiler.
+
+**2. Credentials iOS** (une fois, depuis votre Mac, compte Apple Developer requis)
+
+```bash
+npx eas credentials --platform ios
+```
+
+Laissez EAS générer et conserver le certificat de distribution et le profil de
+provisionnement. C'est indispensable : la CI ne peut pas les créer toute seule,
+elle ne fait que les réutiliser. Un premier `eas build --platform ios` lancé à
+la main depuis le Mac fait le même travail et valide toute la chaîne d'un coup.
+
+**3. Soumission App Store Connect**
+
+- Créer la fiche de l'app (bundle `com.mezdru.allure`), récupérer son
+  identifiant numérique et le mettre dans `eas.json` → `submit.production.ios.ascAppId`.
+- Enregistrer une clé d'API App Store Connect côté EAS (proposé au premier
+  `eas submit`, ou via `eas credentials`). Sans elle, l'envoi demanderait un mot
+  de passe à chaque fois — ce qu'un workflow ne peut pas fournir.
+
+**4. Secret GitHub**
+
+`EXPO_TOKEN` — un jeton d'accès personnel créé sur
+<https://expo.dev/settings/access-tokens>, à ajouter dans
+*Settings → Secrets and variables → Actions*.
+
+Ensuite : *Actions → Release iOS → Run workflow*. La CI (`ci.yml`), elle, ne
+demande **aucun** secret et tourne dès le premier push.
 
 Identifiant de bundle : `com.mezdru.allure`.
 

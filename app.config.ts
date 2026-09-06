@@ -7,12 +7,21 @@
 // entretenue et aucun build Android n'est produit par la pipeline.
 import type { ExpoConfig } from 'expo/config';
 
-// Project ID EAS. Volontairement absent du dépôt tant que le projet n'est pas
-// créé côté Expo : `eas init` l'écrira ici, ou EAS_PROJECT_ID le fournit depuis
-// l'environnement de CI. Ce n'est pas un secret (il figure dans l'URL du projet
-// expo.dev), mais un faux ID est pire qu'aucun — eas-cli publierait alors sur
-// le mauvais projet.
-const easProjectId = process.env.EAS_PROJECT_ID;
+// Project ID EAS. Ce n'est PAS un secret — il figure dans l'URL du projet sur
+// expo.dev et dans le bundle —, mais eas-cli résout le projet par cette valeur :
+// sans elle, aucune commande `eas` ne fonctionne en mode non interactif.
+//
+// Deux façons de le fournir, au choix :
+//   1. le coller ci-dessous après `eas init` (le plus simple, et c'est ce que
+//      fait le workflow de release s'il ne trouve rien dans l'environnement) ;
+//   2. le passer par EAS_PROJECT_ID — variable de dépôt GitHub `EAS_PROJECT_ID`,
+//      que .github/workflows/release-ios.yml injecte déjà.
+//
+// Laissé vide tant que le projet Expo n'existe pas : un ID inventé serait pire
+// que pas d'ID du tout, eas-cli publierait sur le mauvais projet.
+const EAS_PROJECT_ID = '';
+
+const easProjectId = process.env.EAS_PROJECT_ID || EAS_PROJECT_ID;
 
 const config: ExpoConfig = {
   name: 'Allure',
