@@ -16,6 +16,8 @@ import {
   saveActivity,
 } from '@/entities/activity/repo';
 import { paceTable } from '@/entities/pace/model';
+import type { TrainingPlan } from '@/entities/plan/model';
+import { deletePlan, listPlans, savePlan } from '@/entities/plan/repo';
 import { DEFAULT_SETTINGS, type Settings } from '@/entities/settings/model';
 import { loadSettings, saveSettings } from '@/entities/settings/repo';
 import { estimateBlocks } from '@/entities/workout/estimate';
@@ -43,6 +45,7 @@ type PlanState = {
   settings: Settings;
   workouts: Workout[];
   activities: Activity[];
+  plans: TrainingPlan[];
   clipboard: WeekClipboard | null;
 
   hydrate: () => void;
@@ -65,6 +68,9 @@ type PlanState = {
   pasteWeek: (monday: DayKey, mode: 'replace' | 'merge') => number;
   clearWeek: (monday: DayKey) => number;
   shiftPlan: (fromMonday: DayKey, weeks: number) => void;
+
+  upsertPlan: (plan: TrainingPlan) => void;
+  removePlan: (id: string) => void;
 
   addActivity: (activity: Activity) => void;
   removeActivity: (id: string) => void;
@@ -89,12 +95,19 @@ export const usePlanStore = create<PlanState>((set, get) => ({
   settings: DEFAULT_SETTINGS,
   workouts: [],
   activities: [],
+  plans: [],
   clipboard: null,
 
   hydrate: () => {
     const settings = loadSettings();
     const workouts = listWorkouts().map((workout) => withEstimate(workout, settings));
-    set({ ready: true, settings, workouts, activities: listActivities() });
+    set({
+      ready: true,
+      settings,
+      workouts,
+      activities: listActivities(),
+      plans: listPlans(),
+    });
   },
 
   updateSettings: (patch) => {
@@ -255,6 +268,21 @@ export const usePlanStore = create<PlanState>((set, get) => ({
       for (const workout of moved) saveWorkout(workout);
     });
     set({ workouts: sortWorkouts(moved) });
+  },
+
+  upsertPlan: (plan) => {
+    savePlan(plan);
+    const others = get().plans.filter((candidate) => candidate.id !== plan.id);
+    // Triés du plus récent au plus ancien, comme la requête : l'ordre de la
+    // liste ne doit pas dépendre du chemin par lequel on y arrive.
+    set({
+      plans: [...others, plan].sort((a, b) => (a.startMonday < b.startMonday ? 1 : -1)),
+    });
+  },
+
+  removePlan: (id) => {
+    deletePlan(id);
+    set({ plans: get().plans.filter((plan) => plan.id !== id) });
   },
 
   addActivity: (activity) => {

@@ -13,10 +13,14 @@ export type RootStackParamList = {
   ActivityDetail: { activityId: string };
   Zones: undefined;
   Backup: undefined;
+  /** Cadre d'un plan. Sans `planId`, on en crée un nouveau. */
+  PlanBuilder: { planId?: string } | undefined;
+  PlanDetail: { planId: string };
 };
 
 export type TabParamList = {
   Plan: undefined;
+  Stats: undefined;
   Run: undefined;
   Activities: undefined;
   Settings: undefined;

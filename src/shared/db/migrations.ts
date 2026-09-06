@@ -65,6 +65,31 @@ const MIGRATIONS: ((db: SQLiteDatabase) => void)[] = [
       );
     `);
   },
+
+  // v2 — plans d'entraînement. Les séances ne portent PAS de `plan_id` : un
+  // plan couvre une plage de dates, et l'appartenance s'en déduit. Cela évite
+  // qu'une séance déplacée hors du plan devienne orpheline, et qu'un plan
+  // décalé laisse derrière lui des références mortes.
+  (db) => {
+    db.execSync(`
+      CREATE TABLE plans (
+        id TEXT PRIMARY KEY NOT NULL,
+        name TEXT NOT NULL,
+        goal TEXT NOT NULL,
+        start_monday TEXT NOT NULL,
+        weeks INTEGER NOT NULL,
+        race_date TEXT,
+        -- Objectifs de volume hebdomadaire, en mètres, sérialisés : un
+        -- tableau de N nombres pour N semaines.
+        weekly_targets TEXT NOT NULL,
+        notes TEXT NOT NULL DEFAULT '',
+        created_at INTEGER NOT NULL,
+        updated_at INTEGER NOT NULL
+      );
+
+      CREATE INDEX idx_plans_start ON plans (start_monday);
+    `);
+  },
 ];
 
 export function runMigrations(db: SQLiteDatabase): void {

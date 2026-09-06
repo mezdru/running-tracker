@@ -7,12 +7,14 @@ import {
   ClipboardPaste,
   Copy,
   Play,
+  Target,
   Trash2,
 } from 'lucide-react-native';
 import { useMemo, useState } from 'react';
 import { Alert, Pressable, ScrollView, StyleSheet, View } from 'react-native';
 
 import type { RootStackParamList } from '@/app/navigation/types';
+import { activePlan, planCovers, planMondays } from '@/entities/plan/model';
 import { saveUserTemplate } from '@/entities/workout/templates';
 import type { Workout } from '@/entities/workout/model';
 import { DayRow } from '@/features/plan/ui/DayRow';
@@ -35,8 +37,9 @@ import {
   weekKey,
   type DayKey,
 } from '@/shared/lib/date';
+import { formatKm } from '@/shared/lib/format';
 import { colors, radius, spacing } from '@/shared/theme';
-import { Body, Button, Label, Row, Screen, Segmented, Sheet, Small, Title } from '@/shared/ui';
+import { Body, Button, Card, Label, Row, Screen, Segmented, Sheet, Small, Title } from '@/shared/ui';
 
 type Nav = NativeStackNavigationProp<RootStackParamList>;
 type Mode = 'month' | 'week';
@@ -46,6 +49,7 @@ export function PlanScreen() {
   const workouts = usePlanStore((state) => state.workouts);
   const activities = usePlanStore((state) => state.activities);
   const clipboard = usePlanStore((state) => state.clipboard);
+  const plans = usePlanStore((state) => state.plans);
   const store = usePlanStore();
 
   const today = todayKey();
@@ -59,6 +63,13 @@ export function PlanScreen() {
     () => weekSummary(workouts, activities, monday),
     [workouts, activities, monday],
   );
+
+  // Plan en cours et rang de la semaine affichée dans ce plan. Le bandeau ne
+  // s'affiche que si la semaine regardée appartient au plan : au-delà, il
+  // donnerait un « S14/12 » qui n'existe pas.
+  const plan = activePlan(plans, today);
+  const planWeekIndex = plan ? planMondays(plan).indexOf(monday) : -1;
+  const planTargetM = plan && planWeekIndex >= 0 ? plan.weeklyTargetsM[planWeekIndex] ?? 0 : 0;
   const days = useMemo(() => weekDays(fromKey(monday)), [monday]);
   const selectedWorkouts = workoutsOn(workouts, selected);
 
@@ -172,6 +183,43 @@ export function PlanScreen() {
         </View>
         <Button label="Aujourd’hui" variant="secondary" size="sm" onPress={goToday} />
       </View>
+
+      {plan ? (
+        <Card
+          style={styles.planBanner}
+          accent={colors.accent}
+          onPress={() => navigation.navigate('PlanDetail', { planId: plan.id })}
+        >
+          <View style={styles.planText}>
+            <Label color={colors.accent}>
+              {planWeekIndex >= 0
+                ? `Semaine ${planWeekIndex + 1} / ${plan.weeks}`
+                : planCovers(plan, today)
+                  ? 'Plan en cours'
+                  : 'Plan à venir'}
+            </Label>
+            <Body style={styles.planName} numberOfLines={1}>
+              {plan.name}
+            </Body>
+          </View>
+          {planTargetM > 0 ? (
+            <View style={styles.planTarget}>
+              <Small style={styles.planTargetValue}>{formatKm(planTargetM, 0)} km</Small>
+              <Label>Objectif</Label>
+            </View>
+          ) : null}
+        </Card>
+      ) : (
+        <Button
+          label="Créer un plan d’entraînement"
+          variant="secondary"
+          size="sm"
+          full
+          style={styles.planBanner}
+          icon={<Target size={14} color={colors.text} />}
+          onPress={() => navigation.navigate('PlanBuilder')}
+        />
+      )}
 
       {mode === 'month' ? (
         <View style={styles.section}>
@@ -366,6 +414,16 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   controls: { flexDirection: 'row', alignItems: 'center', gap: spacing.md },
+  planBanner: {
+    marginTop: spacing.lg,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.md,
+  },
+  planText: { flex: 1, gap: 2 },
+  planName: { fontWeight: '700' },
+  planTarget: { alignItems: 'flex-end' },
+  planTargetValue: { color: colors.text, fontWeight: '800' },
   segmented: { flex: 1 },
   section: { gap: spacing.lg, paddingTop: spacing.lg },
   dayHeader: {

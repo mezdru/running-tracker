@@ -28,9 +28,30 @@ mettent à jour toutes les allures cibles et toutes les estimations du plan, d'u
 seul geste. Une zone peut aussi porter une allure absolue, pour un objectif
 chronométré qui ne doit pas suivre la forme du moment.
 
+**Construire un plan.** Un plan se crée à la main : objectif (5 km à marathon),
+date de course, durée, volume de départ, progression hebdomadaire, semaine
+d'assimilation tous les N cycles, affûtage. L'app en tire les objectifs de
+chaque semaine — la charge monte, une semaine d'assimilation la fait
+redescendre sans casser la progression, et l'affûtage se calcule sur le pic.
+Chaque objectif reste modifiable semaine par semaine. Le plan **ne crée aucune
+séance** : il donne la cible, vous posez les séances. Ce n'est pas un
+entraîneur et il ne prétend pas l'être.
+
 **Voir le plan.** Vue mensuelle avec le kilométrage de chaque jour et le total
 de chaque semaine en marge ; vue hebdomadaire avec les totaux prévus, le
-réalisé, et le détail jour par jour.
+réalisé, et le détail jour par jour. Un bandeau rappelle où l'on en est dans
+le plan en cours.
+
+**Se relire.** Un onglet de statistiques sur 8 semaines, 12 semaines, 6 mois ou
+la durée du plan : volume, temps, dénivelé, allure moyenne pondérée par la
+distance, plus longue sortie, meilleur kilomètre, jours actifs. Le volume
+hebdomadaire est tracé avec le prévu et l'objectif du plan, et chaque semaine
+affiche son évolution en pourcentage — colorée, parce qu'une hausse n'est pas
+bonne en soi. S'y ajoutent la répartition par type de séance, le temps passé
+dans chaque allure, la régularité, et le **rapport de charge aiguë sur charge
+chronique** : les sept derniers jours comparés à l'habitude des quatre
+dernières semaines. Ce n'est pas le volume absolu qui expose à la blessure,
+c'est l'écart avec ce à quoi le corps est habitué.
 
 **Manipuler des semaines.** Copier une semaine, la coller ailleurs (en
 remplacement ou en ajout), la vider, décaler tout le plan d'une semaine.
@@ -171,6 +192,21 @@ que l'app est faite pour tourner sans couverture — et elle est fausse dès qu'
 quitte les routes, ce qui arrive tout le temps en course à pied (piste, sentier,
 stade, plage). Un baromètre donnerait un meilleur dénivelé que le GPS ; c'est le
 prochain gain de précision identifié.
+
+### Les statistiques ne flattent pas
+
+`src/features/stats/compute.ts` est pur et testé, et plusieurs de ses règles
+existent pour **refuser de conclure** :
+
+- une évolution hebdomadaire depuis une semaine vide n'est pas « +∞ % », c'est
+  une reprise : le pourcentage n'est pas affiché ;
+- le rapport de charge divise par quatre semaines, il exige donc quatre
+  semaines d'historique. Sans elles, une première sortie après une coupure
+  donnerait mécaniquement un rapport de 4 et une alerte absurde ;
+- l'allure moyenne se calcule sur les totaux, jamais comme moyenne des allures
+  — une sortie de 20 km ne pèse pas comme un footing de 5 km ;
+- au-delà de 15 % de hausse d'une semaine à l'autre, la couleur passe à l'ambre
+  puis au rouge. Une progression n'est pas bonne parce qu'elle monte.
 
 ### La sauvegarde est traitée comme un risque, pas comme une option
 

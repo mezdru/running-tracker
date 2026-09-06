@@ -7,6 +7,7 @@
 import Constants from 'expo-constants';
 
 import { listActivitiesWithTracks, saveActivity } from '@/entities/activity/repo';
+import { deletePlan, listPlans, savePlan } from '@/entities/plan/repo';
 import { loadSettings, writeSettings } from '@/entities/settings/repo';
 import type { Workout } from '@/entities/workout/model';
 import { listWorkouts, saveWorkout } from '@/entities/workout/repo';
@@ -26,6 +27,7 @@ export function collectBackup(): Backup {
     workouts: listWorkouts(),
     activities: listActivitiesWithTracks(),
     templates: listUserTemplates(),
+    plans: listPlans(),
   };
 }
 
@@ -35,6 +37,7 @@ export type RestoreResult = {
   workouts: number;
   activities: number;
   templates: number;
+  plans: number;
 };
 
 /**
@@ -47,7 +50,7 @@ export type RestoreResult = {
  */
 export function restoreBackup(backup: Backup, mode: RestoreMode): RestoreResult {
   const database = db();
-  const result: RestoreResult = { workouts: 0, activities: 0, templates: 0 };
+  const result: RestoreResult = { workouts: 0, activities: 0, templates: 0, plans: 0 };
 
   const existingWorkouts = new Set(listWorkouts().map((workout) => workout.id));
   const existingActivities = new Set(
@@ -56,6 +59,7 @@ export function restoreBackup(backup: Backup, mode: RestoreMode): RestoreResult 
       .map((row) => row.id),
   );
   const existingTemplates = new Set(listUserTemplates().map((template) => template.id));
+  const existingPlans = listPlans();
 
   transaction(() => {
     if (mode === 'replace') {
@@ -63,6 +67,7 @@ export function restoreBackup(backup: Backup, mode: RestoreMode): RestoreResult 
       database.runSync('DELETE FROM activities');
       database.runSync('DELETE FROM workouts');
       database.runSync('DELETE FROM templates');
+      for (const plan of existingPlans) deletePlan(plan.id);
       existingWorkouts.clear();
       existingActivities.clear();
       existingTemplates.clear();
@@ -96,6 +101,13 @@ export function restoreBackup(backup: Backup, mode: RestoreMode): RestoreResult 
         ],
       );
       result.templates += 1;
+    }
+
+    const keptPlans = new Set(mode === 'replace' ? [] : existingPlans.map((p) => p.id));
+    for (const plan of backup.plans ?? []) {
+      if (keptPlans.has(plan.id)) continue;
+      savePlan(plan);
+      result.plans += 1;
     }
 
     // Les réglages ne sont écrasés qu'en remplacement : en fusion, ceux en

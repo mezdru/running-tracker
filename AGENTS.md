@@ -19,8 +19,8 @@ n'importe jamais une couche plus spécifique qu'elle.
 | Dossier | Contenu |
 | --- | --- |
 | `src/shared` | Thème, bibliothèque de composants, utilitaires purs (`format`, `geo`, `date`), accès SQLite |
-| `src/entities` | Modèles métier et persistance : `pace`, `workout`, `activity`, `settings` |
-| `src/features` | Logique applicative : `plan` (magasin, calendrier), `run` (moteur, GPS, sons), `activity` (rapport, GPX) |
+| `src/entities` | Modèles métier et persistance : `pace`, `workout`, `activity`, `plan`, `settings`, `backup` |
+| `src/features` | Logique applicative : `plan` (magasin, calendrier), `run` (moteur, GPS, sons), `activity` (rapport, récompenses, GPX), `stats` (calculs), `backup` |
 | `src/screens` | Un fichier par écran, assemblage uniquement |
 | `src/app` | Amorçage, navigation, garde-fou d'erreur |
 

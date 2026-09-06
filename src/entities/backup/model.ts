@@ -11,6 +11,7 @@
 //      choisi par erreur dans l'explorateur ne doit pas écraser un plan
 //      d'entraînement, donc tout est validé avant d'écrire quoi que ce soit.
 import type { Activity } from '@/entities/activity/model';
+import type { TrainingPlan } from '@/entities/plan/model';
 import type { Settings } from '@/entities/settings/model';
 import type { Workout } from '@/entities/workout/model';
 import type { Template } from '@/entities/workout/templates';
@@ -32,6 +33,11 @@ export type Backup = {
   workouts: Workout[];
   activities: Activity[];
   templates: Template[];
+  /**
+   * Optionnel : les sauvegardes du format 1 antérieures aux plans n'en ont
+   * pas, et doivent rester restaurables.
+   */
+  plans?: TrainingPlan[];
 };
 
 /** Ce qu'un fichier contient, avant toute décision de restauration. */
@@ -81,6 +87,11 @@ export function readBackup(raw: string): BackupCheck {
     };
   }
 
+  // `plans` est absent des toutes premières sauvegardes : son absence est
+  // normale, seule une valeur PRÉSENTE et mal formée est une erreur.
+  const plans = parsed.plans === undefined ? [] : asIdentifiedArray(parsed.plans);
+  if (!plans) return { ok: false, reason: 'Sauvegarde incomplète ou abîmée.' };
+
   const workouts = asIdentifiedArray(parsed.workouts);
   const activities = asIdentifiedArray(parsed.activities);
   const templates = asIdentifiedArray(parsed.templates);
@@ -101,6 +112,7 @@ export function readBackup(raw: string): BackupCheck {
     workouts: workouts as unknown as Workout[],
     activities: activities as unknown as Activity[],
     templates: templates as unknown as Template[],
+    plans: plans as unknown as TrainingPlan[],
   };
 
   return { ok: true, backup, summary: summarize(backup) };

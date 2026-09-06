@@ -1,16 +1,19 @@
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { DarkTheme, NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { CalendarDays, History, Play, Settings2 } from 'lucide-react-native';
+import { CalendarDays, ChartColumn, History, Play, Settings2 } from 'lucide-react-native';
 
 import { ActivitiesScreen } from '@/screens/ActivitiesScreen';
 import { BackupScreen } from '@/screens/BackupScreen';
 import { ActivityDetailScreen } from '@/screens/ActivityDetailScreen';
+import { PlanBuilderScreen } from '@/screens/PlanBuilderScreen';
+import { PlanDetailScreen } from '@/screens/PlanDetailScreen';
 import { PlanScreen } from '@/screens/PlanScreen';
 import { RunSessionScreen } from '@/screens/RunSessionScreen';
 import { RunSetupScreen } from '@/screens/RunSetupScreen';
 import { RunSummaryScreen } from '@/screens/RunSummaryScreen';
 import { SettingsScreen } from '@/screens/SettingsScreen';
+import { StatsScreen } from '@/screens/StatsScreen';
 import { WorkoutEditorScreen } from '@/screens/WorkoutEditorScreen';
 import { ZonesScreen } from '@/screens/ZonesScreen';
 import { colors } from '@/shared/theme';
@@ -55,6 +58,14 @@ function Tabs() {
         options={{
           title: 'Plan',
           tabBarIcon: ({ color, size }) => <CalendarDays size={size} color={color} />,
+        }}
+      />
+      <Tab.Screen
+        name="Stats"
+        component={StatsScreen}
+        options={{
+          title: 'Stats',
+          tabBarIcon: ({ color, size }) => <ChartColumn size={size} color={color} />,
         }}
       />
       <Tab.Screen
@@ -114,6 +125,12 @@ export function RootNavigator() {
         <Stack.Screen name="ActivityDetail" component={ActivityDetailScreen} />
         <Stack.Screen name="Zones" component={ZonesScreen} options={{ presentation: 'modal' }} />
         <Stack.Screen name="Backup" component={BackupScreen} />
+        <Stack.Screen
+          name="PlanBuilder"
+          component={PlanBuilderScreen}
+          options={{ presentation: 'modal' }}
+        />
+        <Stack.Screen name="PlanDetail" component={PlanDetailScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );
