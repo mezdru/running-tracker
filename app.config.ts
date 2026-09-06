@@ -27,7 +27,7 @@ const config: ExpoConfig = {
   // Doit correspondre au projet EAS (expo.dev/accounts/mezdru/projects/…) :
   // eas-cli refuse de publier si le slug diverge de celui du projet.
   slug: 'running-tracker',
-  version: '1.2.0',
+  version: '1.2.1',
   orientation: 'portrait',
   icon: './assets/icon.png',
   scheme: 'allure',
