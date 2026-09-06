@@ -192,3 +192,29 @@ describe('weekSummary', () => {
     expect(summary.doneDistanceM).toBe(10500);
   });
 });
+
+describe('zones', () => {
+  it('inclut la marche, en allure absolue', () => {
+    const walk = DEFAULT_SETTINGS.zones.find((zone) => zone.id === 'z_marche');
+    expect(walk).toBeDefined();
+    // Marcher ne va pas plus vite parce qu'on progresse en course : la zone ne
+    // doit surtout pas suivre la VMA.
+    expect(walk?.mode).toBe('pace');
+  });
+
+  it('estime une récupération marchée à une distance de marcheur', () => {
+    const workout = usePlanStore.getState().createWorkout({
+      date: '2026-09-07',
+      name: 'Fractionné',
+      kind: 'intervals',
+      blocks: [
+        repeatBlock(10, [
+          makeStep({ kind: 'interval', zoneId: 'z_vma', target: { type: 'time', seconds: 60 } }),
+          makeStep({ kind: 'walk', zoneId: 'z_marche', target: { type: 'time', seconds: 60 } }),
+        ]),
+      ],
+    });
+    // 10 × (1 min à VMA 16 km/h = 267 m + 1 min de marche à 9:00/km = 111 m).
+    expect(Math.round(workout.estDistanceM)).toBe(3778);
+  });
+});

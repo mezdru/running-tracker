@@ -9,25 +9,37 @@ import { Body, Card, Label, Small, Stat } from '@/shared/ui';
 import { RouteMap } from './RouteMap';
 import { SplitList } from './SplitList';
 
-type Props = { activity: Activity; zones: PaceZone[] };
+type Props = {
+  activity: Activity;
+  zones: PaceZone[];
+  /**
+   * `summary` retire les chiffres déjà mis en avant par la célébration de fin
+   * de séance — distance, temps, allure, dénivelé —, pour ne pas afficher deux
+   * fois la même chose à dix centimètres d'écart.
+   */
+  variant?: 'full' | 'summary';
+};
 
 /**
  * Compte rendu d'un effort : carte, totaux, kilomètres, et — pour une séance
  * structurée — le réalisé étape par étape confronté à l'allure visée. C'est ce
  * dernier tableau qui dit si la séance a été tenue, pas la moyenne générale.
  */
-export function ActivityReport({ activity, zones }: Props) {
+export function ActivityReport({ activity, zones, variant = 'full' }: Props) {
   const pace = averagePace(activity);
+  const full = variant === 'full';
 
   return (
     <View style={styles.wrap}>
       <RouteMap track={activity.track} />
 
-      <Card style={styles.stats}>
-        <Stat value={formatKm(activity.distanceM, 2)} unit="km" label="Distance" />
-        <Stat value={formatDuration(activity.durationS)} label="Temps" />
-        <Stat value={formatPace(pace)} unit="/km" label="Allure" />
-      </Card>
+      {full ? (
+        <Card style={styles.stats}>
+          <Stat value={formatKm(activity.distanceM, 2)} unit="km" label="Distance" />
+          <Stat value={formatDuration(activity.durationS)} label="Temps" />
+          <Stat value={formatPace(pace)} unit="/km" label="Allure" />
+        </Card>
+      ) : null}
 
       <Card style={styles.secondary}>
         <View style={styles.secondaryItem}>
@@ -36,10 +48,12 @@ export function ActivityReport({ activity, zones }: Props) {
               de « 01:31 » se lit comme une incohérence. */}
           <Body style={styles.secondaryValue}>{formatDuration(activity.movingS)}</Body>
         </View>
-        <View style={styles.secondaryItem}>
-          <Label>Dénivelé +</Label>
-          <Body style={styles.secondaryValue}>{Math.round(activity.elevGainM)} m</Body>
-        </View>
+        {full ? (
+          <View style={styles.secondaryItem}>
+            <Label>Dénivelé +</Label>
+            <Body style={styles.secondaryValue}>{Math.round(activity.elevGainM)} m</Body>
+          </View>
+        ) : null}
         <View style={styles.secondaryItem}>
           <Label>Points GPS</Label>
           <Body style={styles.secondaryValue}>{activity.track.length}</Body>

@@ -12,13 +12,27 @@ export function formatDuration(seconds: number): string {
   return h > 0 ? `${h}:${pad(m)}:${pad(s)}` : `${pad(m)}:${pad(s)}`;
 }
 
-/** Durée compacte pour les résumés : `1 h 12`, `45 min`, `40 s`. */
+/** Sous ce seuil, une durée garde ses secondes : `1 min 30`. */
+const SECONDS_VISIBLE_BELOW = 600;
+
+/** Durée compacte pour les résumés : `1 h 12`, `45 min`, `1 min 30`, `40 s`. */
 export function formatDurationShort(seconds: number): string {
   const total = Math.max(0, Math.round(seconds));
   if (total < 60) return `${total} s`;
+
   const h = Math.floor(total / 3600);
+  if (h === 0) {
+    const m = Math.floor(total / 60);
+    const s = total % 60;
+    // Les secondes ne sont montrées que sur les durées courtes — celles d'un
+    // fractionné. Sans cela, 90 s et 120 s s'affichent tous deux « 2 min » et
+    // deux raccourcis voisins deviennent indiscernables. Au-delà de dix
+    // minutes, la seconde n'apporte rien à une estimation de séance.
+    if (s === 0 || total >= SECONDS_VISIBLE_BELOW) return `${Math.round(total / 60)} min`;
+    return `${m} min ${s}`;
+  }
+
   const m = Math.round((total % 3600) / 60);
-  if (h === 0) return `${m} min`;
   // 59 min arrondies à 60 donneraient « 1 h 60 ».
   return m === 60 ? `${h + 1} h` : `${h} h ${String(m).padStart(2, '0')}`;
 }

@@ -5,13 +5,23 @@ import { boundsOf, simplifyPath, simplifyTrack, type TrackPoint } from '@/shared
 import { colors, radius, spacing } from '@/shared/theme';
 import { Small } from '@/shared/ui';
 
-type Props = { track: TrackPoint[]; height?: number };
+type Props = {
+  track: TrackPoint[];
+  height?: number;
+  /**
+   * Carte manipulable. Faux par défaut, et c'est important : posée au milieu
+   * d'un écran qui défile, une carte interactive CAPTE le geste de défilement
+   * — on croit faire défiler la page, on déplace la carte, et le contenu situé
+   * en dessous devient inatteignable.
+   */
+  interactive?: boolean;
+};
 
 /**
  * Tracé de la sortie sur la carte. Aucune clé d'API n'est nécessaire : sur iOS,
  * `react-native-maps` s'appuie sur Apple Plans, déjà présent sur l'appareil.
  */
-export function RouteMap({ track, height = 240 }: Props) {
+export function RouteMap({ track, height = 240, interactive = false }: Props) {
   if (track.length < 2) {
     return (
       <View style={[styles.placeholder, { height }]}>
@@ -48,6 +58,10 @@ export function RouteMap({ track, height = 240 }: Props) {
         showsUserLocation={false}
         toolbarEnabled={false}
         userInterfaceStyle="dark"
+        scrollEnabled={interactive}
+        zoomEnabled={interactive}
+        rotateEnabled={interactive}
+        pitchEnabled={interactive}
       >
         <Polyline coordinates={points} strokeColor={colors.accent} strokeWidth={4} />
         <Marker coordinate={points[0]} title="Départ" pinColor={colors.success} />

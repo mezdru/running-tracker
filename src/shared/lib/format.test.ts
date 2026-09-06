@@ -30,6 +30,18 @@ describe('formatDurationShort', () => {
     expect(formatDurationShort(2700)).toBe('45 min');
     expect(formatDurationShort(4320)).toBe('1 h 12');
   });
+
+  it('garde les secondes sur les durées courtes', () => {
+    // 90 s et 120 s sont deux raccourcis voisins de l'éditeur : ils ne doivent
+    // pas s'afficher tous les deux « 2 min ».
+    expect(formatDurationShort(90)).toBe('1 min 30');
+    expect(formatDurationShort(120)).toBe('2 min');
+    expect(formatDurationShort(45)).toBe('45 s');
+  });
+
+  it('arrondit à la minute au-delà de dix minutes', () => {
+    expect(formatDurationShort(605)).toBe('10 min');
+  });
 });
 
 describe('formatPace', () => {

@@ -202,7 +202,9 @@ export function RunSessionScreen() {
               <Small style={styles.ringUnit}>
                 {remaining.type === 'time' ? 'restant' : 'mètres restants'}
               </Small>
-              {step.targetPaceSecPerKm > 0 ? (
+              {/* Pas de cible d'allure sur une étape marchée : on marche, on
+                  ne vise pas un chrono au kilomètre. */}
+              {step.kind !== 'walk' && step.targetPaceSecPerKm > 0 ? (
                 <Body style={[styles.target, { color: accent }]}>
                   cible {formatPace(step.targetPaceSecPerKm)} /km
                 </Body>

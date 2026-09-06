@@ -7,6 +7,7 @@ import { createAudioPlayer, setAudioModeAsync, type AudioPlayer } from 'expo-aud
 import * as Haptics from 'expo-haptics';
 import * as Speech from 'expo-speech';
 
+import type { StepKind } from '@/entities/workout/model';
 import { spokenDistance, spokenDuration, spokenPace } from '@/shared/lib/format';
 
 import type { RunEvent } from './engine';
@@ -113,6 +114,7 @@ export type CueSettings = { voiceEnabled: boolean; beepsEnabled: boolean };
 
 /** Phrase annonçant une étape : son nom, sa cible, son allure. */
 export function describeStep(step: {
+  kind: StepKind;
   label: string;
   target: { type: 'time'; seconds: number } | { type: 'distance'; meters: number };
   targetPaceSecPerKm: number;
@@ -123,7 +125,13 @@ export function describeStep(step: {
       : spokenDistance(step.target.meters);
   // « 3/8 » se lirait « trois huitièmes » : la synthèse a besoin du mot.
   const label = step.label.replace(/(\d+)\/(\d+)/, '$1 sur $2');
-  const pace = step.targetPaceSecPerKm > 0 ? ` à ${spokenPace(step.targetPaceSecPerKm)}` : '';
+  // Aucune allure annoncée en marchant : « marchez à 9 minutes au kilomètre »
+  // n'est pas une consigne qu'on peut suivre, c'est juste du bruit dans
+  // l'oreille au moment où l'on souffle.
+  const pace =
+    step.kind !== 'walk' && step.targetPaceSecPerKm > 0
+      ? ` à ${spokenPace(step.targetPaceSecPerKm)}`
+      : '';
   return `${label}. ${cible}${pace}.`;
 }
 

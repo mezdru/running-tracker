@@ -1,7 +1,13 @@
 import { ArrowDown, ArrowUp, Copy, Plus, Trash2 } from 'lucide-react-native';
 import { Pressable, StyleSheet, View } from 'react-native';
 
-import { findZone, resolvePace, type PaceZone } from '@/entities/pace/model';
+import {
+  ZONE_IDS,
+  findZone,
+  preferredZoneId,
+  resolvePace,
+  type PaceZone,
+} from '@/entities/pace/model';
 import { targetLabel } from '@/entities/workout/display';
 import {
   STEP_KIND_LABEL,
@@ -206,7 +212,7 @@ export function BlockList({ blocks, zones, vmaKmh, onChange, onEditStep }: Props
                       ...block.steps,
                       makeStep({
                         kind: 'recovery',
-                        zoneId: zones[0]?.id ?? '',
+                        zoneId: preferredZoneId(zones, ZONE_IDS.recovery),
                         target: { type: 'time', seconds: 60 },
                       }),
                     ],

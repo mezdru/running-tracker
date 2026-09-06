@@ -3,10 +3,22 @@
 // absente retombe sur sa valeur par défaut.
 import { DEFAULT_VMA_KMH, DEFAULT_ZONES, type PaceZone } from '@/entities/pace/model';
 
+/**
+ * Version du jeu de zones intégrées. Incrémentée quand une zone est AJOUTÉE
+ * aux valeurs par défaut, pour qu'une installation existante la reçoive sans
+ * perdre ses réglages — et sans que la zone revienne indéfiniment si
+ * l'utilisateur la supprime ensuite (cf. `loadSettings`).
+ *   1 → jeu initial
+ *   2 → ajout de la marche
+ */
+export const ZONES_VERSION = 2;
+
 export type Settings = {
   /** Vitesse maximale aérobie, en km/h : la référence de toutes les allures. */
   vmaKmh: number;
   zones: PaceZone[];
+  /** Cf. `ZONES_VERSION`. */
+  zonesVersion: number;
   /** Annonces vocales des changements d'étape. */
   voiceEnabled: boolean;
   /** Bips courts : trois avant la fin d'une étape, un au changement. */
@@ -26,6 +38,7 @@ export type Settings = {
 export const DEFAULT_SETTINGS: Settings = {
   vmaKmh: DEFAULT_VMA_KMH,
   zones: DEFAULT_ZONES,
+  zonesVersion: ZONES_VERSION,
   voiceEnabled: true,
   beepsEnabled: true,
   countdownS: 5,

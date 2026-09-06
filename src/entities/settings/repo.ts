@@ -1,6 +1,7 @@
+import { DEFAULT_ZONES } from '@/entities/pace/model';
 import { db } from '@/shared/db';
 
-import { DEFAULT_SETTINGS, type Settings } from './model';
+import { DEFAULT_SETTINGS, ZONES_VERSION, type Settings } from './model';
 
 /**
  * Relit les réglages clé par clé et retombe sur les valeurs par défaut pour
@@ -23,7 +24,39 @@ export function loadSettings(): Settings {
       // valeur illisible : on garde le défaut déjà en place
     }
   }
-  return settings;
+
+  return migrateZones(settings, stored);
+}
+
+/**
+ * Réinsère les zones intégrées apparues après l'installation.
+ *
+ * Le cas concret : une base créée avant l'ajout de la marche contient ses sept
+ * zones et rien d'autre, si bien que les modèles qui référencent la marche
+ * tomberaient sur une allure inexistante. On ne le fait qu'UNE fois, en
+ * mémorisant la version : sans cela, une zone volontairement supprimée
+ * reviendrait à chaque démarrage.
+ */
+function migrateZones(settings: Settings, stored: Map<string, string>): Settings {
+  // Aucune ligne `zones` : installation neuve, les défauts sont déjà à jour.
+  // Ligne présente mais sans version : base d'avant l'introduction du compteur.
+  const version = stored.has('zonesVersion')
+    ? settings.zonesVersion
+    : stored.has('zones')
+      ? 1
+      : ZONES_VERSION;
+  if (version >= ZONES_VERSION) return { ...settings, zonesVersion: ZONES_VERSION };
+
+  const known = new Set(settings.zones.map((zone) => zone.id));
+  const zones = [...settings.zones];
+  // Chaque manquante est réinsérée à SON rang dans les défauts, pour que
+  // l'ordre reste une progression d'intensité.
+  DEFAULT_ZONES.forEach((zone, index) => {
+    if (known.has(zone.id)) return;
+    zones.splice(Math.min(index, zones.length), 0, zone);
+  });
+
+  return { ...settings, zones, zonesVersion: ZONES_VERSION };
 }
 
 export function saveSettings(settings: Settings): void {

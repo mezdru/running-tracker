@@ -5,7 +5,7 @@ import { useMemo, useState } from 'react';
 import { Alert, Pressable, StyleSheet, TextInput, View } from 'react-native';
 
 import type { RootStackParamList } from '@/app/navigation/types';
-import { paceTable } from '@/entities/pace/model';
+import { ZONE_IDS, paceTable, preferredZoneId } from '@/entities/pace/model';
 import { estimateBlocks } from '@/entities/workout/estimate';
 import {
   WORKOUT_KINDS,
@@ -65,7 +65,7 @@ export function WorkoutEditorScreen() {
           singleBlock(
             makeStep({
               kind: 'run',
-              zoneId: settings.zones[1]?.id ?? settings.zones[0]?.id ?? '',
+              zoneId: preferredZoneId(settings.zones, ZONE_IDS.easy),
               target: { type: 'time', seconds: 45 * 60 },
             }),
           ),
@@ -143,7 +143,7 @@ export function WorkoutEditorScreen() {
     ]);
   };
 
-  const defaultZone = settings.zones[1]?.id ?? settings.zones[0]?.id ?? '';
+  const defaultZone = preferredZoneId(settings.zones, ZONE_IDS.easy);
 
   // Trois mois de dates proposées : au-delà, on prépare rarement une séance
   // isolée — on duplique une semaine.
@@ -251,12 +251,12 @@ export function WorkoutEditorScreen() {
               repeatBlock(8, [
                 makeStep({
                   kind: 'interval',
-                  zoneId: settings.zones[5]?.id ?? defaultZone,
+                  zoneId: preferredZoneId(settings.zones, ZONE_IDS.vma),
                   target: { type: 'distance', meters: 400 },
                 }),
                 makeStep({
                   kind: 'recovery',
-                  zoneId: settings.zones[0]?.id ?? defaultZone,
+                  zoneId: preferredZoneId(settings.zones, ZONE_IDS.recovery),
                   target: { type: 'time', seconds: 60 },
                 }),
               ]),

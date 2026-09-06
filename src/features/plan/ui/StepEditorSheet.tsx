@@ -1,6 +1,6 @@
 import { StyleSheet, View } from 'react-native';
 
-import { resolvePace, type PaceZone } from '@/entities/pace/model';
+import { ZONE_IDS, resolvePace, type PaceZone } from '@/entities/pace/model';
 import { STEP_KIND_LABEL, type Step, type StepKind } from '@/entities/workout/model';
 import { formatPace } from '@/shared/lib/format';
 import { spacing } from '@/shared/theme';
@@ -17,7 +17,7 @@ type Props = {
   onClose: () => void;
 };
 
-const KINDS: StepKind[] = ['warmup', 'interval', 'recovery', 'run', 'cooldown'];
+const KINDS: StepKind[] = ['warmup', 'interval', 'recovery', 'walk', 'run', 'cooldown'];
 
 /**
  * Édition d'une étape. En feuille modale et non sur un écran dédié : construire
@@ -38,7 +38,17 @@ export function StepEditorSheet({ step, zones, vmaKmh, onChange, onDelete, onClo
                   key={kind}
                   label={STEP_KIND_LABEL[kind]}
                   active={step.kind === kind}
-                  onPress={() => onChange({ ...step, kind })}
+                  onPress={() => {
+                    // Choisir « Marche » bascule aussi l'allure : personne ne
+                    // veut d'une étape marchée dont la cible est une allure de
+                    // course. L'allure reste modifiable juste en dessous.
+                    const walkZone = zones.find((zone) => zone.id === ZONE_IDS.walk);
+                    onChange({
+                      ...step,
+                      kind,
+                      zoneId: kind === 'walk' && walkZone ? walkZone.id : step.zoneId,
+                    });
+                  }}
                 />
               ))}
             </View>

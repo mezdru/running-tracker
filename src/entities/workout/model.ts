@@ -6,7 +6,7 @@
 import type { DayKey } from '@/shared/lib/date';
 import { newId } from '@/shared/lib/id';
 
-export type StepKind = 'warmup' | 'run' | 'interval' | 'recovery' | 'cooldown';
+export type StepKind = 'warmup' | 'run' | 'interval' | 'recovery' | 'walk' | 'cooldown';
 
 /**
  * Chaque étape se termine sur une distance ou sur une durée — jamais sur une
@@ -62,6 +62,11 @@ export const STEP_KIND_LABEL: Record<StepKind, string> = {
   run: 'Course',
   interval: 'Intervalle',
   recovery: 'Récupération',
+  // La marche est un type d'étape à part entière et pas seulement une allure :
+  // elle change ce que l'app annonce (« Marche, 1 minute » plutôt qu'une
+  // allure au kilomètre, qui ne veut rien dire quand on marche) et ce qu'on
+  // lit sur l'écran de course.
+  walk: 'Marche',
   cooldown: 'Retour au calme',
 };
 

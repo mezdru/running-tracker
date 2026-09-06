@@ -15,6 +15,13 @@ type Props = {
   flush?: boolean;
   edges?: Edge[];
   contentStyle?: ViewStyle;
+  /**
+   * Contenu posé PAR-DESSUS l'écran, hors du défilement : confettis, voile,
+   * indicateur flottant. Placé ici et non dans `children` parce qu'un calque
+   * absolu à l'intérieur d'un ScrollView se positionne par rapport au
+   * contenu — donc défile avec lui et déborde de l'écran.
+   */
+  overlay?: ReactNode;
 };
 
 export function Screen({
@@ -23,6 +30,7 @@ export function Screen({
   flush = false,
   edges = ['top'],
   contentStyle,
+  overlay,
 }: Props) {
   const padding = flush ? undefined : styles.padded;
   return (
@@ -39,6 +47,7 @@ export function Screen({
       ) : (
         <View style={[styles.fill, padding, contentStyle]}>{children}</View>
       )}
+      {overlay}
     </SafeAreaView>
   );
 }

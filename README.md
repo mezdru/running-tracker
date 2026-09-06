@@ -14,6 +14,13 @@ Application personnelle, mono-utilisateur, **entièrement locale**.
 (400 m + 1 min) »), chacun avec sa cible — une distance ou une durée — et son
 allure. La distance et la durée prévues se recalculent à chaque modification.
 
+**Marcher quand il faut marcher.** La marche est un type d'étape à part
+entière : récupération marchée entre deux répétitions, échauffement en marche,
+retour au calme. Elle a sa propre allure — la seule en valeur absolue, parce
+que marcher ne va pas plus vite quand on progresse en course — et l'app cesse
+d'annoncer une allure au kilomètre pendant qu'on souffle. Trois modèles
+l'utilisent, dont une reprise course-marche.
+
 **Raisonner en pourcentage de VMA.** Les allures sont définies par défaut en
 pourcentage de vitesse maximale aérobie (récupération 60 %, endurance
 fondamentale 70 %, seuil 85 %, VMA 100 %…). Changer sa VMA dans les réglages
@@ -40,6 +47,14 @@ verrouillé, en poche.
 **Enregistrer l'effort.** Trace GPS filtrée (voir plus bas), distance, temps en
 mouvement, dénivelé, temps au kilomètre, et le réalisé de chaque étape confronté
 à son allure cible. Le tracé s'affiche sur une carte.
+
+**Être récompensé.** La fin de séance est un moment, pas un tableau : confettis,
+médaille, chiffres qui défilent — puis les récompenses réellement méritées,
+calculées contre tout l'historique. Record de distance, d'allure moyenne ou de
+meilleur kilomètre ; premier 5, 10, 21,1 ou 42,2 km ; série de jours
+consécutifs ; semaine la plus longue ; séance bouclée comme prévu ; tous les
+intervalles tenus ; semaine complète. Rien n'est décerné deux fois, et une
+séance ordinaire ne décroche rien — c'est ce qui donne du prix aux autres.
 
 **Exporter.** Chaque sortie s'exporte en GPX depuis la feuille de partage iOS —
 de quoi l'importer dans Strava dès aujourd'hui, en attendant la synchronisation
@@ -146,6 +161,16 @@ que l'app est faite pour tourner sans couverture — et elle est fausse dès qu'
 quitte les routes, ce qui arrive tout le temps en course à pied (piste, sentier,
 stade, plage). Un baromètre donnerait un meilleur dénivelé que le GPS ; c'est le
 prochain gain de précision identifié.
+
+### Les récompenses sont des faits, pas des félicitations
+
+`src/features/activity/rewards.ts` est pur et testé pour une raison précise :
+une app qui félicite à chaque sortie ne récompense plus rien. Chaque badge est
+donc une comparaison à l'historique complet — et les tests vérifient surtout ce
+qui NE doit pas se déclencher : un effort ne se compare jamais à lui-même, un
+premier 10 km ne se fête qu'une fois, une sortie écourtée n'est pas « bouclée
+comme prévu », un 1,2 km très rapide ne prive pas une sortie longue de son
+record d'allure.
 
 ### Le moteur de séance est pur
 
