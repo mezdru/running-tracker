@@ -1,6 +1,6 @@
 import { useNavigation, useRoute, type RouteProp } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { ChevronLeft, Share2 } from 'lucide-react-native';
+import { ChevronLeft, Share2, Upload } from 'lucide-react-native';
 import { useMemo, useState } from 'react';
 import { Alert, Pressable, StyleSheet, View } from 'react-native';
 
@@ -8,6 +8,7 @@ import type { RootStackParamList } from '@/app/navigation/types';
 import { getActivity } from '@/entities/activity/repo';
 import { ActivityReport } from '@/features/activity/ui/ActivityReport';
 import { shareGpx } from '@/features/activity/gpx';
+import { isStravaInstalled, openStravaApp, openStravaUpload, shareForStrava } from '@/features/activity/strava';
 import { usePlanStore } from '@/features/plan/store';
 import { fromKey, labelDayFull, toKey } from '@/shared/lib/date';
 import { colors, spacing } from '@/shared/theme';
@@ -16,6 +17,15 @@ import { Button, EmptyState, Label, Row, Screen, Sheet, Small, Title } from '@/s
 type Nav = NativeStackNavigationProp<RootStackParamList, 'ActivityDetail'>;
 type DetailRoute = RouteProp<RootStackParamList, 'ActivityDetail'>;
 
+const SHARED_DATE = new Intl.DateTimeFormat('fr-FR', { day: 'numeric', month: 'short' });
+
+/** Le bouton dit s'il a déjà servi : Strava gère mal les doublons. */
+function stravaLabel(sharedAt: number | null): string {
+  return sharedAt
+    ? `Renvoyer à Strava · envoyée le ${SHARED_DATE.format(new Date(sharedAt))}`
+    : 'Envoyer à Strava';
+}
+
 export function ActivityDetailScreen() {
   const navigation = useNavigation<Nav>();
   const { params } = useRoute<DetailRoute>();
@@ -23,6 +33,7 @@ export function ActivityDetailScreen() {
   const workouts = usePlanStore((state) => state.workouts);
   const linkActivity = usePlanStore((state) => state.linkActivity);
   const removeActivity = usePlanStore((state) => state.removeActivity);
+  const markStravaShared = usePlanStore((state) => state.markStravaShared);
   const summaries = usePlanStore((state) => state.activities);
   const [linkOpen, setLinkOpen] = useState(false);
 
@@ -63,6 +74,35 @@ export function ActivityDetailScreen() {
         },
       },
     ]);
+
+  const handleStrava = async () => {
+    if (!activity) return;
+    try {
+      await shareForStrava(activity, workout?.name ?? 'Sortie libre');
+      markStravaShared(activity.id);
+      const installed = await isStravaInstalled();
+      // La feuille de partage ne dit pas si l'import a été mené au bout : on
+      // rappelle donc la marche à suivre, et on propose d'y aller.
+      Alert.alert(
+        'Fichier GPX prêt',
+        installed
+          ? 'Dans Strava : onglet Enregistrer, bouton +, puis Importer, et choisissez le fichier.'
+          : 'Ouvrez strava.com/upload/select et déposez le fichier que vous venez d’enregistrer.',
+        [
+          { text: 'Plus tard', style: 'cancel' },
+          {
+            text: installed ? 'Ouvrir Strava' : 'Ouvrir strava.com',
+            onPress: () => void (installed ? openStravaApp() : openStravaUpload()),
+          },
+        ],
+      );
+    } catch (error) {
+      Alert.alert(
+        'Envoi impossible',
+        error instanceof Error ? error.message : 'Le fichier n’a pas pu être créé.',
+      );
+    }
+  };
 
   const handleShare = async () => {
     try {
@@ -105,6 +145,12 @@ export function ActivityDetailScreen() {
       <ActivityReport activity={activity} zones={settings.zones} />
 
       <View style={styles.actions}>
+        <Button
+          label={stravaLabel(activity.stravaSharedAt)}
+          full
+          icon={<Upload size={16} color={colors.accentInk} />}
+          onPress={handleStrava}
+        />
         <Button
           label={workout ? 'Changer la séance associée' : 'Associer à une séance'}
           variant="secondary"

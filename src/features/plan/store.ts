@@ -75,6 +75,7 @@ type PlanState = {
   addActivity: (activity: Activity) => void;
   removeActivity: (id: string) => void;
   linkActivity: (activityId: string, workoutId: string | null) => void;
+  markStravaShared: (activityId: string) => void;
 };
 
 /** Recalcule distance et durée prévues à partir des allures courantes. */
@@ -295,6 +296,14 @@ export const usePlanStore = create<PlanState>((set, get) => ({
   removeActivity: (id) => {
     dbDeleteActivity(id);
     set({ activities: get().activities.filter((a) => a.id !== id) });
+  },
+
+  markStravaShared: (activityId) => {
+    const activity = get().activities.find((candidate) => candidate.id === activityId);
+    if (!activity) return;
+    const next = { ...activity, stravaSharedAt: Date.now() };
+    saveActivity(next);
+    set({ activities: get().activities.map((a) => (a.id === activityId ? next : a)) });
   },
 
   linkActivity: (activityId, workoutId) => {

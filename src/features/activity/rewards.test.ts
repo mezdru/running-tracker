@@ -21,6 +21,7 @@ function activity(partial: Partial<Activity> & { id: string }): Activity {
     splits: [],
     laps: [],
     stravaActivityId: null,
+    stravaSharedAt: null,
     createdAt: BASE,
     ...partial,
   };

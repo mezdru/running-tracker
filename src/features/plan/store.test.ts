@@ -184,6 +184,7 @@ describe('weekSummary', () => {
       splits: [],
       laps: [],
       stravaActivityId: null,
+    stravaSharedAt: null,
       createdAt: Date.now(),
     });
 

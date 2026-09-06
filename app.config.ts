@@ -23,7 +23,7 @@ const EAS_PROJECT_ID = 'f39e047e-81da-44cb-b2a4-cc4ec4830179';
 const easProjectId = process.env.EAS_PROJECT_ID || EAS_PROJECT_ID;
 
 const config: ExpoConfig = {
-  name: 'Allure',
+  name: 'Running Tracker for the BOT',
   // Doit correspondre au projet EAS (expo.dev/accounts/mezdru/projects/…) :
   // eas-cli refuse de publier si le slug diverge de celui du projet.
   slug: 'running-tracker',
@@ -51,6 +51,10 @@ const config: ExpoConfig = {
       // l'agrandissement système du texte, qui casserait la mise en page des
       // chronos au milieu d'une séance.
       ITSAppUsesNonExemptEncryption: false,
+      // Sans cette déclaration, iOS refuse `canOpenURL('strava://')` et l'app
+      // ne peut pas savoir si Strava est installé — donc pas adapter la marche
+      // à suivre affichée.
+      LSApplicationQueriesSchemes: ['strava'],
     },
   },
   android: {

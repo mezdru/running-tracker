@@ -90,6 +90,12 @@ const MIGRATIONS: ((db: SQLiteDatabase) => void)[] = [
       CREATE INDEX idx_plans_start ON plans (start_monday);
     `);
   },
+
+  // v3 — trace des envois vers Strava. Sert à ne pas envoyer deux fois la même
+  // sortie : Strava n'aime pas les doublons et ne les détecte pas toujours.
+  (db) => {
+    db.execSync('ALTER TABLE activities ADD COLUMN strava_shared_at INTEGER;');
+  },
 ];
 
 export function runMigrations(db: SQLiteDatabase): void {

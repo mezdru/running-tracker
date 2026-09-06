@@ -41,6 +41,13 @@ export type Activity = {
   splits: Split[];
   laps: Lap[];
   stravaActivityId: string | null;
+  /**
+   * Date d'envoi vers Strava, en millisecondes (`null` si jamais envoyée).
+   * L'app ne sait pas si l'import a été mené à son terme — c'est Strava qui
+   * l'exécute —, elle sait seulement que le fichier est parti. C'est
+   * suffisant pour éviter un second envoi par inadvertance.
+   */
+  stravaSharedAt: number | null;
   createdAt: number;
 };
 

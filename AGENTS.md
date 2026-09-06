@@ -60,6 +60,7 @@ npm test
 npm run prebuild      # régénère ios/ depuis app.config.ts
 npm run ios           # build + lancement sur simulateur (Metro inclus)
 npm run cues          # régénère les bips de assets/audio
+npm run icon          # régénère l'icône et l'écran de démarrage
 ```
 
 Les modules natifs utilisés (GPS en arrière-plan, carte, synthèse vocale) ne

@@ -20,6 +20,7 @@ type Row = {
   splits: string;
   laps: string;
   strava_activity_id: string | null;
+  strava_shared_at: number | null;
   created_at: number;
 };
 
@@ -45,6 +46,7 @@ function toActivity(row: Row): Activity {
     splits: parseJson(row.splits, []),
     laps: parseJson(row.laps, []),
     stravaActivityId: row.strava_activity_id,
+    stravaSharedAt: row.strava_shared_at,
     createdAt: row.created_at,
   };
 }
@@ -58,7 +60,8 @@ export function listActivities(): Activity[] {
   return db()
     .getAllSync<Row>(
       `SELECT id, workout_id, started_at, ended_at, distance_m, duration_s, moving_s,
-              elev_gain_m, '[]' AS track, splits, laps, strava_activity_id, created_at
+              elev_gain_m, '[]' AS track, splits, laps, strava_activity_id,
+              strava_shared_at, created_at
          FROM activities
         ORDER BY started_at DESC`,
     )
@@ -85,11 +88,13 @@ export function saveActivity(activity: Activity): void {
   db().runSync(
     `INSERT INTO activities
        (id, workout_id, started_at, ended_at, distance_m, duration_s, moving_s,
-        elev_gain_m, track, splits, laps, strava_activity_id, created_at)
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        elev_gain_m, track, splits, laps, strava_activity_id, strava_shared_at,
+        created_at)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
      ON CONFLICT(id) DO UPDATE SET
        workout_id = excluded.workout_id,
-       strava_activity_id = excluded.strava_activity_id`,
+       strava_activity_id = excluded.strava_activity_id,
+       strava_shared_at = excluded.strava_shared_at`,
     [
       activity.id,
       activity.workoutId,
@@ -103,6 +108,7 @@ export function saveActivity(activity: Activity): void {
       JSON.stringify(activity.splits),
       JSON.stringify(activity.laps),
       activity.stravaActivityId,
+      activity.stravaSharedAt,
       activity.createdAt,
     ],
   );

@@ -375,6 +375,7 @@ export const useRunStore = create<RunState>((set, get) => {
         splits: state.engine.splits,
         laps: state.engine.laps,
         stravaActivityId: null,
+        stravaSharedAt: null,
         createdAt: Date.now(),
       };
 

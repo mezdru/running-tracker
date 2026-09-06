@@ -29,6 +29,7 @@ function activity(partial: Partial<Activity> & { id: string; day: string }): Act
     splits: [],
     laps: [],
     stravaActivityId: null,
+    stravaSharedAt: null,
     createdAt: at(day),
     ...rest,
   };

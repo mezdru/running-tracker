@@ -87,19 +87,21 @@ Fichiers ou n'importe où. La restauration accepte de tout remplacer ou de
 n'ajouter que ce qui manque. Les réglages rappellent quand le dernier export
 hors appareil date de trop.
 
-**Exporter.** Chaque sortie s'exporte en GPX depuis la feuille de partage iOS —
-de quoi l'importer dans Strava dès aujourd'hui, en attendant la synchronisation
-automatique.
+**Envoyer à Strava.** Un bouton par sortie prépare le GPX et ouvre la feuille de
+partage, puis rappelle la marche à suivre — dans l'app Strava si elle est
+installée, sur strava.com/upload sinon. La date d'envoi est mémorisée : Strava
+gère mal les doublons, l'app évite de vous y pousser. Le GPX est aussi
+exportable tel quel vers n'importe quel autre service.
 
 ## Ce qui reste à faire
 
 - **Dénivelé barométrique.** Le baromètre de l'iPhone donne une altitude
   relative bien plus stable que le GPS ; c'est le gain de précision suivant.
-- **Synchronisation Strava automatique.** La colonne `strava_activity_id` existe
-  déjà en base et l'export GPX couvre le besoin en manuel. L'automatiser
-  demandera une brique serveur pour l'échange OAuth (le secret client ne peut
-  pas vivre dans l'app) — c'est le seul morceau qui ferait sortir ce projet du
-  tout-local.
+- **Synchronisation Strava automatique.** Un bouton « Envoyer à Strava » prépare
+  déjà le GPX et ouvre la feuille de partage, en gardant la date d'envoi pour
+  éviter les doublons. L'automatiser demandera une brique serveur pour
+  l'échange OAuth (le secret client ne peut pas vivre dans l'app) — c'est le
+  seul morceau qui ferait sortir ce projet du tout-local.
 - Capteur cardio (Bluetooth ou Apple Watch).
 
 ---
@@ -324,3 +326,4 @@ Identifiant de bundle : `com.mezdru.runningtracker`.
 | `npm run prebuild` | Régénère `ios/` depuis `app.config.ts` |
 | `npm run ios` | Build et lancement sur simulateur |
 | `npm run cues` | Régénère les bips de `assets/audio` |
+| `npm run icon` | Régénère l'icône et l'écran de démarrage |
