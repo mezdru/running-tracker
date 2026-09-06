@@ -1,0 +1,43 @@
+# Vérifications de l'app. Tout ce qui peut échouer sans appareil est vérifié
+# ici : types, style, logique métier (estimation d'une séance, moteur de
+# séance, calculs GPS) et cohérence du projet Expo.
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          # React Native 0.86 refuse Node 22.0 à 22.12 : on prend le LTS 22
+          # courant, pas « 22 » tout court, pour ne pas dépendre du cache du
+          # runner.
+          node-version: 22.13
+          cache: npm
+
+      # `npm ci` et non `npm install` : échoue si package.json et le lockfile
+      # divergent, au lieu de résoudre silencieusement autre chose que ce qui
+      # sera publié.
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Type-check
+        run: npm run typecheck
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Unit tests
+        run: npm test -- --ci
+
+      # Vérifie l'alignement des dépendances sur le SDK et la validité de la
+      # configuration native — les écarts qui ne se voient qu'au moment du build.
+      - name: Expo project health
+        run: npx --yes expo-doctor

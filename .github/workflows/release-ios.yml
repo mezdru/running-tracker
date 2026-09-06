@@ -1,0 +1,160 @@
+# Release iOS : build EAS puis envoi sur App Store Connect, déclenché à la main
+# depuis l'onglet Actions. Complète ci.yml, qui ne fait que les vérifications.
+#
+# Pré-requis :
+#   - secret de dépôt EXPO_TOKEN (https://expo.dev/settings/access-tokens) ;
+#   - `eas init` exécuté une fois en local, ou la variable EAS_PROJECT_ID ;
+#   - `ascAppId` renseigné dans eas.json (profil submit production), après
+#     création de la fiche dans App Store Connect.
+#
+# Le NUMÉRO DE BUILD est géré par EAS (appVersionSource: remote +
+# autoIncrement). La VERSION MARKETING, elle, ne bouge jamais toute seule :
+# c'est l'entrée `version` ci-dessous qui la réécrit dans app.config.ts, la
+# commite et la tague.
+name: Release iOS
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Version marketing (ex. 1.1.0). Vide = garder celle d'app.config.ts."
+        required: false
+        type: string
+      profile:
+        description: 'Profil EAS'
+        required: true
+        default: production
+        type: choice
+        options:
+          - production
+          - preview
+      submit:
+        description: 'Envoyer sur App Store Connect après le build (production uniquement)'
+        required: true
+        default: true
+        type: boolean
+
+# Deux releases simultanées se marcheraient dessus : numéro de build EAS,
+# commit de version, tag. On sérialise sans annuler celle qui tourne déjà.
+concurrency:
+  group: release-store
+  cancel-in-progress: false
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write # commit + tag de la version marketing
+    steps:
+      # Le profil preview produit un IPA à distribution interne, qu'App Store
+      # Connect refuse : on échoue tout de suite plutôt qu'après 20 min de build.
+      - name: Validate inputs
+        if: inputs.submit && inputs.profile != 'production'
+        run: |
+          echo "::error::submit=true exige profile=production (le profil preview n'est pas soumissible)."
+          exit 1
+
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22.13 # aligné sur ci.yml
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      # Mêmes garde-fous que ci.yml : une release ne part pas sur du rouge.
+      - name: Type-check
+        run: npm run typecheck
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Unit tests
+        run: npm test -- --ci
+
+      # L'entrée passe par l'environnement, jamais par une interpolation ${{ }}
+      # dans le script : une valeur arbitraire s'exécuterait dans le runner.
+      - name: Bump marketing version
+        if: inputs.version != ''
+        env:
+          VERSION: ${{ inputs.version }}
+        run: |
+          set -euo pipefail
+          if ! [[ "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "::error::Version invalide : '$VERSION' (attendu X.Y.Z)."
+            exit 1
+          fi
+          node - "$VERSION" <<'NODE'
+          const fs = require('fs');
+          const version = process.argv[2];
+          const file = 'app.config.ts';
+          const src = fs.readFileSync(file, 'utf8');
+          const pattern = /^(\s*version:\s*)'[^']*'/m;
+          if (!pattern.test(src)) {
+            console.error(`::error::Champ version introuvable dans ${file}.`);
+            process.exit(1);
+          }
+          fs.writeFileSync(file, src.replace(pattern, `$1'${version}'`));
+          NODE
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          # Relancer sur une version déjà en place ne doit pas échouer.
+          if git diff --quiet app.config.ts; then
+            echo "app.config.ts est déjà en $VERSION, rien à commiter."
+          else
+            git commit -m "chore(release): version $VERSION" app.config.ts
+          fi
+
+      # packager: npm est obligatoire — l'action installe eas-cli via
+      # `<packager> add` dans un dossier temporaire, et son défaut (yarn) casse
+      # sur les runners actuels. Le projet est npm de toute façon.
+      - uses: expo/expo-github-action@v9
+        with:
+          eas-version: latest
+          packager: npm
+          token: ${{ secrets.EXPO_TOKEN }}
+
+      # --auto-submit enchaîne sur le profil submit du même nom (production),
+      # celui qui porte l'ascAppId dans eas.json.
+      - name: Build${{ inputs.submit && ' + submit' || '' }}
+        run: |
+          eas build \
+            --platform ios \
+            --profile "$PROFILE" \
+            --non-interactive \
+            $SUBMIT_FLAG
+        env:
+          PROFILE: ${{ inputs.profile }}
+          SUBMIT_FLAG: ${{ inputs.submit && '--auto-submit' || '' }}
+          EAS_BUILD_NO_EXPO_GO_WARNING: 'true'
+
+      # Poussé seulement maintenant : un build raté ne laisse pas derrière lui
+      # un commit de version qui ne correspond à aucune release.
+      - name: Push version commit and tag
+        if: inputs.version != ''
+        env:
+          VERSION: ${{ inputs.version }}
+        run: |
+          set -euo pipefail
+          git push origin "HEAD:${GITHUB_REF_NAME}"
+          if git ls-remote --exit-code --tags origin "v$VERSION" >/dev/null 2>&1; then
+            echo "::warning::Le tag v$VERSION existe déjà sur origin, non recréé."
+          else
+            git tag -a "v$VERSION" -m "Release iOS v$VERSION"
+            git push origin "v$VERSION"
+          fi
+
+      - name: Summary
+        if: always()
+        env:
+          VERSION: ${{ inputs.version }}
+          PROFILE: ${{ inputs.profile }}
+        run: |
+          {
+            echo "### Release iOS"
+            echo "- Profil : \`$PROFILE\`"
+            echo "- Version marketing : ${VERSION:-inchangée}"
+            echo "- Soumission : ${{ inputs.submit && 'oui' || 'non' }}"
+          } >> "$GITHUB_STEP_SUMMARY"

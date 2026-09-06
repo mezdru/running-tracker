@@ -9,7 +9,12 @@ dist/
 web-build/
 expo-env.d.ts
 
-# Native
+# Native — les dossiers ios/ et android/ sont RÉGÉNÉRÉS par `expo prebuild`
+# depuis app.config.ts. Les versionner reviendrait à entretenir deux sources de
+# vérité pour la configuration native, et à réintroduire à chaque mise à jour du
+# SDK les conflits que la génération élimine.
+/ios
+/android
 .kotlin/
 *.orig.*
 *.jks
